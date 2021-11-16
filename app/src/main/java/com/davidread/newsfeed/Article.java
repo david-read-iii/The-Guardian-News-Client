@@ -8,22 +8,22 @@ public class Article {
     /**
      * {@link String} representing the title of the article.
      */
-    private String title;
+    private final String title;
 
     /**
      * {@link String} representing the name of the section the article is from.
      */
-    private String sectionName;
+    private final String sectionName;
 
     /**
      * {@link String} representing the date the article was published.
      */
-    private String datePublished;
+    private final String datePublished;
 
     /**
      * {@link String} representing a URL that points to the article online.
      */
-    private String url;
+    private final String url;
 
     /**
      * Constructs a new {@link Article} object.

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">News Feed</string>
+    <string name="empty_list_label">No articles found</string>
 </resources>
