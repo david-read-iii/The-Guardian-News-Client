@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,11 +23,9 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
 
     /**
      * Constructs a new {@link ArticleAdapter} object.
-     *
-     * @param articles {@link List} of {@link Article} objects being adapted.
      */
-    public ArticleAdapter(List<Article> articles) {
-        this.articles = articles;
+    public ArticleAdapter() {
+        this.articles = new ArrayList<>();
     }
 
     /**
@@ -71,5 +70,23 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
     @Override
     public int getItemCount() {
         return articles.size();
+    }
+
+    /**
+     * Adds a {@link List} of {@link Article} objects to the {@link List} held by the adapter.
+     *
+     * @param newArticles {@link List} of {@link Article} objects to add.
+     */
+    public void addAll(List<Article> newArticles) {
+        articles.addAll(newArticles);
+        notifyItemRangeInserted(articles.size(), newArticles.size());
+    }
+
+    /**
+     * Resets the {@link List} held by the adapter.
+     */
+    public void reset() {
+        this.articles = new ArrayList<>();
+        notifyItemRangeRemoved(0, articles.size());
     }
 }
