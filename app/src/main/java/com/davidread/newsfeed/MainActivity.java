@@ -1,6 +1,10 @@
 package com.davidread.newsfeed;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
+import android.webkit.URLUtil;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +24,37 @@ public class MainActivity extends AppCompatActivity {
      * {@link String} log tag name for {@link MainActivity}.
      */
     public static final String LOG_TAG_NAME = MainActivity.class.getSimpleName();
+
+    /**
+     * {@link com.davidread.newsfeed.RecyclerViewOnItemClickListener.OnItemClickListener} defines
+     * how the {@link RecyclerView} handles its itemClick event.
+     */
+    private final RecyclerViewOnItemClickListener.OnItemClickListener onItemClickListener = new RecyclerViewOnItemClickListener.OnItemClickListener() {
+
+        /**
+         * Handles itemClick event. On this event, start an intent to open the browser. The URL of
+         * the site will be determined by the {@link Article} object associated with the clicked
+         * item.
+         *
+         * @param view     {@link View} within the {@link RecyclerView} that was clicked.
+         * @param position int representing the position of the view within the adapter.
+         */
+        @Override
+        public void onItemClick(View view, int position) {
+
+            Article article = (Article) articleAdapter.getItem(position);
+            String url = article.getUrl();
+
+            // Do nothing if the provided URL is invalid.
+            if (url == null || !URLUtil.isValidUrl(url)) {
+                return;
+            }
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(url));
+            startActivity(intent);
+        }
+    };
 
     /**
      * {@link LoaderManager.LoaderCallbacks} object that defines how the {@link ArticleLoader}
@@ -85,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        recyclerView.addOnItemTouchListener(new RecyclerViewOnItemClickListener(this, onItemClickListener));
 
         // Start new ArticleLoader.
         LoaderManager.getInstance(MainActivity.this).initLoader(0, null, loaderCallbacks);

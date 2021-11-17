@@ -73,6 +73,18 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
     }
 
     /**
+     * Returns the {@link Article} object at the specified position in the {@link List} held by the
+     * adapter.
+     *
+     * @param position int representing the position of the item to get.
+     * @return {@link Article} object at the specified position in the {@link List} held by the
+     * adapter.
+     */
+    public Article getItem(int position) {
+        return articles.get(position);
+    }
+
+    /**
      * Adds a {@link List} of {@link Article} objects to the {@link List} held by the adapter.
      *
      * @param newArticles {@link List} of {@link Article} objects to add.
