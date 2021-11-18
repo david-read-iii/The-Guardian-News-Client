@@ -57,6 +57,33 @@ public class MainActivity extends AppCompatActivity {
     };
 
     /**
+     * {@link androidx.recyclerview.widget.RecyclerView.OnScrollListener} defines how the
+     * {@link RecyclerView} handles its scrolled event.
+     */
+    private final RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
+
+        /**
+         * Handles scrolled event. On this event, check if the last item of the {@link RecyclerView}
+         * is visible. If so, initialize a new {@link ArticleLoader} to fetch more {@link Article}
+         * objects to display.
+         *
+         * @param recyclerView  {@link RecyclerView} object being scrolled.
+         * @param dx            The amount of horizontal scroll.
+         * @param dy            The amount of vertical scroll.
+         */
+        @Override
+        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+            int totalItemCount = linearLayoutManager.getItemCount();
+            int lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
+            if (lastVisibleItemPosition == totalItemCount - 1) {
+                LoaderManager.getInstance(MainActivity.this).initLoader(nextArticleLoaderId, null, loaderCallbacks);
+            }
+        }
+    };
+
+    /**
      * {@link LoaderManager.LoaderCallbacks} object that defines how the {@link ArticleLoader}
      * handles its createLoader, loadFinished, and loaderReset events.
      */
@@ -74,12 +101,14 @@ public class MainActivity extends AppCompatActivity {
         @NonNull
         @Override
         public Loader<List<Article>> onCreateLoader(int id, @Nullable Bundle args) {
-            return new ArticleLoader(MainActivity.this, "newest", 1, null);
+            return new ArticleLoader(MainActivity.this, "newest", nextPageIndex, null);
         }
 
         /**
          * Handles loadFinished event. On this event, add the {@link List} returned by the completed
-         * {@link ArticleLoader} to the {@link ArticleAdapter}.
+         * {@link ArticleLoader} to the {@link ArticleAdapter}. Then, increment the
+         * nextArticleLoaderId and nextPageIndex global variables for future {@link ArticleLoader}
+         * objects. Finally, destroy the completed {@link ArticleLoader}.
          *
          * @param loader    {@link ArticleLoader} object that completed.
          * @param data      {@link List} of {@link Article} objects returned by the completed
@@ -88,6 +117,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onLoadFinished(@NonNull Loader<List<Article>> loader, List<Article> data) {
             articleAdapter.addAll(data);
+            nextArticleLoaderId++;
+            nextPageIndex++;
+            LoaderManager.getInstance(MainActivity.this).destroyLoader(loader.getId());
         }
 
         @Override
@@ -106,6 +138,17 @@ public class MainActivity extends AppCompatActivity {
      */
     private RecyclerView recyclerView;
 
+    /**
+     * int representing the next id that may be assigned to an {@link ArticleLoader} object.
+     */
+    private int nextArticleLoaderId;
+
+    /**
+     * int representing the next page index that needs to be fetched by an {@link ArticleLoader}
+     * object.
+     */
+    private int nextPageIndex;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,8 +164,13 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerView.addOnItemTouchListener(new RecyclerViewOnItemClickListener(this, onItemClickListener));
+        recyclerView.addOnScrollListener(onScrollListener);
+
+        // Initialize id and page index for ArticleLoader objects.
+        nextArticleLoaderId = 0;
+        nextPageIndex = 1;
 
         // Start new ArticleLoader.
-        LoaderManager.getInstance(MainActivity.this).initLoader(0, null, loaderCallbacks);
+        LoaderManager.getInstance(MainActivity.this).initLoader(nextArticleLoaderId, null, loaderCallbacks);
     }
 }
