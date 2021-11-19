@@ -40,9 +40,14 @@ public class MainActivity extends AppCompatActivity {
          * @param position int representing the position of the view within the adapter.
          */
         @Override
-        public void onItemClick(View view, int position) {
+        public void onItemClick(View view, int position, int viewType) {
 
-            Article article = (Article) articleAdapter.getItem(position);
+            // Do nothing if the view type is not an article view.
+            if (viewType != ArticleAdapter.VIEW_TYPE_ARTICLE) {
+                return;
+            }
+
+            Article article = (Article) articleAdapter.getArticle(position);
             String url = article.getUrl();
 
             // Do nothing if the provided URL is invalid.
@@ -101,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
         @NonNull
         @Override
         public Loader<List<Article>> onCreateLoader(int id, @Nullable Bundle args) {
+            articleAdapter.showLoadingView();
             return new ArticleLoader(MainActivity.this, "newest", nextPageIndex, null);
         }
 
@@ -116,7 +122,8 @@ public class MainActivity extends AppCompatActivity {
          */
         @Override
         public void onLoadFinished(@NonNull Loader<List<Article>> loader, List<Article> data) {
-            articleAdapter.addAll(data);
+            articleAdapter.hideLoadingView();
+            articleAdapter.addAllArticles(data);
             nextArticleLoaderId++;
             nextPageIndex++;
             LoaderManager.getInstance(MainActivity.this).destroyLoader(loader.getId());

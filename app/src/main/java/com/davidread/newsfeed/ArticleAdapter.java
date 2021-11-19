@@ -18,20 +18,33 @@ import java.util.List;
 public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     /**
+     * Constants representing the view types that the adapter returns.
+     */
+    public static final int VIEW_TYPE_ARTICLE = 0;
+    public static final int VIEW_TYPE_LOADING = 1;
+
+    /**
      * {@link List} of {@link Article} objects being adapted.
      */
     private List<Article> articles;
+
+    /**
+     * Boolean representing whether a loading view is being adapted at the end of the
+     * {@link RecyclerView}.
+     */
+    private boolean loadingViewVisible;
 
     /**
      * Constructs a new {@link ArticleAdapter} object.
      */
     public ArticleAdapter() {
         this.articles = new ArrayList<>();
+        this.loadingViewVisible = false;
     }
 
     /**
      * Called when the {@link RecyclerView} needs a new {@link RecyclerView.ViewHolder} to represent
-     * an {@link Article} object.
+     * either an {@link Article} object or a loading view.
      *
      * @param parent   {@link ViewGroup} into which the new {@link View} will be added after it is
      *                 bound to an adapter position.
@@ -41,74 +54,114 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_article, parent, false);
-        return new ArticleViewHolder(itemView);
+        if (viewType == VIEW_TYPE_ARTICLE) {
+            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_article, parent, false);
+            return new ArticleViewHolder(itemView);
+        } else {
+            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_loading, parent, false);
+            return new LoadingViewHolder(itemView);
+        }
     }
 
     /**
-     * Called when the {@link RecyclerView} to display the data at the specified position. It
-     * updates the contents of the given {@link RecyclerView.ViewHolder} to reflect the
-     * {@link Article} object at the given position.
+     * Called when the {@link RecyclerView} to bind data to a {@link RecyclerView.ViewHolder} object
+     * at a certain position index in the adapter. Only {@link ArticleViewHolder} objects need
+     * to be bound with data about their corresponding {@link Article} object.
      *
-     * @param holder   {@link RecyclerView.ViewHolder} to be updated.
-     * @param position int representing the position of the {@link Article} object within the
-     *                 adapter's {@link List} of {@link Article} objects.
+     * @param holder   {@link RecyclerView.ViewHolder} to be bound.
+     * @param position The {@link RecyclerView.ViewHolder} object's position index in the adapter.
      */
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        Article article = articles.get(position);
-        ArticleViewHolder articleViewHolder = (ArticleViewHolder) holder;
-        articleViewHolder.getTitleTextView().setText(article.getTitle());
-        articleViewHolder.getSectionNameTextView().setText(article.getSectionName());
-        articleViewHolder.getDatePublishedTextView().setText(article.getDatePublished());
+        if (holder instanceof ArticleViewHolder) {
+            Article article = articles.get(position);
+            ArticleViewHolder articleViewHolder = (ArticleViewHolder) holder;
+            articleViewHolder.getTitleTextView().setText(article.getTitle());
+            articleViewHolder.getSectionNameTextView().setText(article.getSectionName());
+            articleViewHolder.getDatePublishedTextView().setText(article.getDatePublished());
+        }
     }
 
     /**
-     * Returns the total number of {@link Article} objects stored in the {@link List} held by the
-     * adapter.
+     * Returns the total number of items this adapter is adapting. Items include the {@link Article}
+     * objects and the loading view.
      *
-     * @return The total number of {@link Article} objects in this adapter.
+     * @return The total number of items this adapter is adapting.
      */
     @Override
     public int getItemCount() {
-        return articles.size();
+        if (loadingViewVisible) {
+            return articles.size() + 1;
+        } else {
+            return articles.size();
+        }
     }
 
     /**
-     * Returns the {@link Article} object at the specified position in the {@link List} held by the
-     * adapter.
+     * Returns an int representing the view type of the item given its position in the adapter.
      *
-     * @param position int representing the position of the item to get.
-     * @return {@link Article} object at the specified position in the {@link List} held by the
-     * adapter.
+     * @param position The items position index in the adapter.
+     * @return The view type of the item.
      */
-    public Article getItem(int position) {
+    @Override
+    public int getItemViewType(int position) {
+        if (position < articles.size()) {
+            return VIEW_TYPE_ARTICLE;
+        } else {
+            return VIEW_TYPE_LOADING;
+        }
+    }
+
+    /**
+     * Returns the {@link Article} object given its position index in the adapter.
+     *
+     * @param position The {@link Article} object's position index in the adapter.
+     * @return {@link Article} object given its adapter position index.
+     */
+    public Article getArticle(int position) {
         return articles.get(position);
     }
 
     /**
-     * Adds a {@link List} of {@link Article} objects to the {@link List} held by the adapter.
+     * Adds a {@link List} of {@link Article} objects to the end of the {@link List} of objects
+     * being adapted.
      *
-     * @param newArticles {@link List} of {@link Article} objects to add.
+     * @param newArticles {@link List} of new {@link Article} objects to be adapted.
      */
-    public void addAll(List<Article> newArticles) {
+    public void addAllArticles(List<Article> newArticles) {
         articles.addAll(newArticles);
-        notifyItemRangeInserted(articles.size(), newArticles.size());
+        notifyItemRangeInserted(getItemCount(), newArticles.size());
     }
 
     /**
-     * Resets the {@link List} held by the adapter.
+     * Resets the {@link List} of objects being adapted.
      */
-    public void reset() {
+    public void resetArticles() {
         this.articles = new ArrayList<>();
-        notifyItemRangeRemoved(0, articles.size());
+        notifyItemRangeRemoved(0, getItemCount());
     }
 
     /**
-     * {@link ArticleViewHolder} is a model class that describes a single item view and metadata
-     * about its place within a {@link RecyclerView}.
+     * Adds a loading view to the end of the adapter.
      */
-    private class ArticleViewHolder extends RecyclerView.ViewHolder {
+    public void showLoadingView() {
+        loadingViewVisible = true;
+        notifyItemInserted(getItemCount() - 1);
+    }
+
+    /**
+     * Removes the loading view from the end of the adapter.
+     */
+    public void hideLoadingView() {
+        loadingViewVisible = false;
+        notifyItemRemoved(getItemCount());
+    }
+
+    /**
+     * {@link ArticleViewHolder} is a model class that describes a single article item view and
+     * metadata about its place within a {@link RecyclerView}.
+     */
+    private static class ArticleViewHolder extends RecyclerView.ViewHolder {
 
         /**
          * {@link TextView} to hold the title of an article.
@@ -126,7 +179,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         private final TextView datePublishedTextView;
 
         /**
-         * Constructs a new {@link ArticleViewHolder} object given a {@link View} object
+         * Constructs a new {@link ArticleViewHolder}.
          *
          * @param itemView {@link View} to be held in the {@link ArticleViewHolder}.
          */
@@ -156,6 +209,22 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
          */
         public TextView getDatePublishedTextView() {
             return datePublishedTextView;
+        }
+    }
+
+    /**
+     * {@link LoadingViewHolder} is a model class that describes a single loading item view and
+     * metadata about its place within a {@link RecyclerView}.
+     */
+    private static class LoadingViewHolder extends RecyclerView.ViewHolder {
+
+        /**
+         * Constructs a new {@link LoadingViewHolder}.
+         *
+         * @param itemView {@link View} to be held in the {@link LoadingViewHolder}.
+         */
+        public LoadingViewHolder(@NonNull View itemView) {
+            super(itemView);
         }
     }
 }
