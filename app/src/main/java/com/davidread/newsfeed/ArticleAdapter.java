@@ -14,16 +14,18 @@ import java.util.List;
 /**
  * {@link ArticleAdapter} is an adapter class that provides a binding from a {@link List} of
  * {@link Article} objects to views that are displayed within a {@link RecyclerView}. It also
- * allows loading and error views to be shown below the adapted {@link Article} objects.
+ * allows a single footer view to be shown below the adapted {@link Article} objects.
  */
 public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     /**
      * Constants representing the view types that the adapter returns.
      */
+    public static final int VIEW_TYPE_UNDEFINED = -1;
     public static final int VIEW_TYPE_ARTICLE = 0;
     public static final int VIEW_TYPE_LOADING = 1;
     public static final int VIEW_TYPE_ERROR = 2;
+    public static final int VIEW_TYPE_END_OF_LIST = 3;
 
     /**
      * {@link List} of {@link Article} objects being adapted.
@@ -31,16 +33,19 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private List<Article> articles;
 
     /**
-     * Boolean representing whether a loading view is being adapted at the end of the
-     * {@link RecyclerView}.
+     * Boolean representing whether a loading view is being adapted as the footer view.
      */
     private boolean loadingViewVisible;
 
     /**
-     * Boolean representing whether an error view is being adapted at the end of the
-     * {@link RecyclerView}.
+     * Boolean representing whether an error view is being adapted as the footer view.
      */
     private boolean errorViewVisible;
+
+    /**
+     * Boolean representing whether an end of list view is being adapted as the footer view.
+     */
+    private boolean endOfListViewVisible;
 
     /**
      * Constructs a new {@link ArticleAdapter} object.
@@ -49,11 +54,12 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.articles = new ArrayList<>();
         this.loadingViewVisible = false;
         this.errorViewVisible = false;
+        this.endOfListViewVisible = false;
     }
 
     /**
      * Called when the {@link RecyclerView} needs a new {@link RecyclerView.ViewHolder} to represent
-     * either an {@link Article} object, a loading view, or an error view.
+     * either an {@link Article} object or a footer view.
      *
      * @param parent   {@link ViewGroup} into which the new {@link View} will be added after it is
      *                 bound to an adapter position.
@@ -68,10 +74,15 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             return new ArticleViewHolder(itemView);
         } else if (viewType == VIEW_TYPE_LOADING) {
             View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_loading, parent, false);
-            return new LoadingViewHolder(itemView);
-        } else {
+            return new FooterViewHolder(itemView);
+        } else if (viewType == VIEW_TYPE_ERROR) {
             View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_error, parent, false);
-            return new ErrorViewHolder(itemView);
+            return new FooterViewHolder(itemView);
+        } else if (viewType == VIEW_TYPE_END_OF_LIST) {
+            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_end_of_list, parent, false);
+            return new FooterViewHolder(itemView);
+        } else {
+            return new FooterViewHolder(new View(parent.getContext()));
         }
     }
 
@@ -103,10 +114,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public int getItemCount() {
         int itemCount = articles.size();
-        if (loadingViewVisible) {
-            itemCount++;
-        }
-        if (errorViewVisible) {
+        if (loadingViewVisible || errorViewVisible || endOfListViewVisible) {
             itemCount++;
         }
         return itemCount;
@@ -124,8 +132,12 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             return VIEW_TYPE_ARTICLE;
         } else if (loadingViewVisible) {
             return VIEW_TYPE_LOADING;
-        } else {
+        } else if (errorViewVisible) {
             return VIEW_TYPE_ERROR;
+        } else if (endOfListViewVisible) {
+            return VIEW_TYPE_END_OF_LIST;
+        } else {
+            return VIEW_TYPE_UNDEFINED;
         }
     }
 
@@ -159,65 +171,43 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     /**
-     * Adds a loading view to the end of the adapter. Hides the error view if it is visible.
+     * Adds a footer view of the specified view type to the adapter. Only one footer view may be
+     * shown at once.
+     *
+     * @param viewType Int representing the type of view to be shown.
      */
-    public void showLoadingView() {
+    public void showFooterView(int viewType) {
 
-        // Do nothing if the loading view is already visible.
-        if (loadingViewVisible) {
+        if (loadingViewVisible || errorViewVisible || endOfListViewVisible) {
+            hideFooterView();
+        }
+
+        if (viewType == VIEW_TYPE_LOADING) {
+            loadingViewVisible = true;
+        } else if (viewType == VIEW_TYPE_ERROR) {
+            errorViewVisible = true;
+        } else if (viewType == VIEW_TYPE_END_OF_LIST) {
+            endOfListViewVisible = true;
+        } else {
             return;
         }
-
-        if (errorViewVisible) {
-            hideErrorView();
-        }
-        loadingViewVisible = true;
         notifyItemInserted(getItemCount() - 1);
     }
 
     /**
-     * Removes the loading view from the end of the adapter.
+     * Removes the footer view from the end of the adapter.
      */
-    public void hideLoadingView() {
-
-        // Do nothing if the loading view is already hidden.
-        if (!loadingViewVisible) {
-            return;
-        }
-
-        loadingViewVisible = false;
-        notifyItemRemoved(getItemCount());
-    }
-
-    /**
-     * Adds an error view to the end of the adapter. Hides the loading view if it is visible.
-     */
-    public void showErrorView() {
-
-        // Do nothing if the error view is already visible.
-        if (errorViewVisible) {
-            return;
-        }
-
+    public void hideFooterView() {
         if (loadingViewVisible) {
-            hideLoadingView();
+            loadingViewVisible = false;
+            notifyItemRemoved(getItemCount());
+        } else if (errorViewVisible) {
+            errorViewVisible = false;
+            notifyItemRemoved(getItemCount());
+        } else if (endOfListViewVisible) {
+            endOfListViewVisible = false;
+            notifyItemRemoved(getItemCount());
         }
-        errorViewVisible = true;
-        notifyItemInserted(getItemCount() - 1);
-    }
-
-    /**
-     * Removes the error view from the end of the adapter.
-     */
-    public void hideErrorView() {
-
-        // Do nothing if the error view is already hidden.
-        if (!errorViewVisible) {
-            return;
-        }
-
-        errorViewVisible = false;
-        notifyItemRemoved(getItemCount());
     }
 
     /**
@@ -276,33 +266,17 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     /**
-     * {@link LoadingViewHolder} is a model class that describes a single loading item view and
+     * {@link FooterViewHolder} is a model class that describes a single footer item view and
      * metadata about its place within a {@link RecyclerView}.
      */
-    private static class LoadingViewHolder extends RecyclerView.ViewHolder {
+    private static class FooterViewHolder extends RecyclerView.ViewHolder {
 
         /**
-         * Constructs a new {@link LoadingViewHolder}.
+         * Constructs a new {@link FooterViewHolder}.
          *
-         * @param itemView {@link View} to be held in the {@link LoadingViewHolder}.
+         * @param itemView {@link View} to be held in the {@link FooterViewHolder}.
          */
-        public LoadingViewHolder(@NonNull View itemView) {
-            super(itemView);
-        }
-    }
-
-    /**
-     * {@link ErrorViewHolder} is a model class that describes a single error item view and
-     * metadata about its place within a {@link RecyclerView}.
-     */
-    private static class ErrorViewHolder extends RecyclerView.ViewHolder {
-
-        /**
-         * Constructs a new {@link ErrorViewHolder}.
-         *
-         * @param itemView {@link View} to be held in the {@link ErrorViewHolder}.
-         */
-        public ErrorViewHolder(@NonNull View itemView) {
+        public FooterViewHolder(@NonNull View itemView) {
             super(itemView);
         }
     }

@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.URLUtil;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -43,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
          */
         @Override
         public void onItemClick(View view, int position, int viewType) {
-
             if (viewType == ArticleAdapter.VIEW_TYPE_ARTICLE) {
 
                 Article article = (Article) articleAdapter.getArticle(position);
@@ -57,14 +57,11 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse(url));
                 startActivity(intent);
-            }
-
-            else if (viewType == ArticleAdapter.VIEW_TYPE_ERROR) {
-                articleAdapter.hideErrorView();
+            } else if (viewType == ArticleAdapter.VIEW_TYPE_ERROR) {
+                articleAdapter.hideFooterView();
                 recyclerView.addOnScrollListener(onScrollListener);
                 LoaderManager.getInstance(MainActivity.this).initLoader(nextArticleLoaderId, null, loaderCallbacks);
             }
-
         }
     };
 
@@ -114,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
         @NonNull
         @Override
         public Loader<List<Article>> onCreateLoader(int id, @Nullable Bundle args) {
-            articleAdapter.showLoadingView();
+            articleAdapter.showFooterView(ArticleAdapter.VIEW_TYPE_LOADING);
             ArticleLoader articleLoader = new ArticleLoader(MainActivity.this, "newest", nextPageIndex, null);
             articleLoader.registerOnLoadCanceledListener(onLoadCanceledListener);
             return articleLoader;
@@ -123,7 +120,8 @@ public class MainActivity extends AppCompatActivity {
         /**
          * Handles loadFinished event. On this event, hide the loading view in the
          * {@link RecyclerView} and add the {@link List} returned by the completed
-         * {@link ArticleLoader} to the {@link ArticleAdapter}. Then, increment the
+         * {@link ArticleLoader} to the {@link ArticleAdapter}. Then, remove the scroll listener
+         * if no data was returned by the {@link ArticleLoader}. Then, increment the
          * nextArticleLoaderId and nextPageIndex global variables for future {@link ArticleLoader}
          * objects. Finally, destroy the completed {@link ArticleLoader}.
          *
@@ -133,8 +131,16 @@ public class MainActivity extends AppCompatActivity {
          */
         @Override
         public void onLoadFinished(@NonNull Loader<List<Article>> loader, List<Article> data) {
-            articleAdapter.hideLoadingView();
+            articleAdapter.hideFooterView();
             articleAdapter.addAllArticles(data);
+            if (data.isEmpty()) {
+                recyclerView.removeOnScrollListener(onScrollListener);
+                if (articleAdapter.getItemCount() == 0) {
+                    emptyListTextView.setVisibility(View.VISIBLE);
+                } else {
+                    articleAdapter.showFooterView(ArticleAdapter.VIEW_TYPE_END_OF_LIST);
+                }
+            }
             nextArticleLoaderId++;
             nextPageIndex++;
             LoaderManager.getInstance(MainActivity.this).destroyLoader(loader.getId());
@@ -160,8 +166,8 @@ public class MainActivity extends AppCompatActivity {
          */
         @Override
         public void onLoadCanceled(@NonNull Loader<List<Article>> loader) {
-            articleAdapter.hideLoadingView();
-            articleAdapter.showErrorView();
+            articleAdapter.hideFooterView();
+            articleAdapter.showFooterView(ArticleAdapter.VIEW_TYPE_ERROR);
             recyclerView.removeOnScrollListener(onScrollListener);
             LoaderManager.getInstance(MainActivity.this).destroyLoader(loader.getId());
         }
@@ -177,6 +183,11 @@ public class MainActivity extends AppCompatActivity {
      * {@link RecyclerView} for displaying a {@link List} of {@link Article} objects.
      */
     private RecyclerView recyclerView;
+
+    /**
+     * {@link TextView} set to visible when the {@link RecyclerView} is empty.
+     */
+    private TextView emptyListTextView;
 
     /**
      * int representing the next id that may be assigned to an {@link ArticleLoader} object.
@@ -205,6 +216,9 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerView.addOnItemTouchListener(new RecyclerViewOnItemClickListener(this, onItemClickListener));
         recyclerView.addOnScrollListener(onScrollListener);
+
+        // Setup empty list text view.
+        emptyListTextView = findViewById(R.id.empty_list_text_view);
 
         // Initialize id and page index for ArticleLoader objects.
         nextArticleLoaderId = 0;
