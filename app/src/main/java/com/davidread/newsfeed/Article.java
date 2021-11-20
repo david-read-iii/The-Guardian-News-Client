@@ -1,9 +1,30 @@
 package com.davidread.newsfeed;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
- * {@link Article} is a model class for an article listing.
+ * {@link Article} is a model class for an article listing. It implements the {@link Parcelable}
+ * interface so that {@link java.util.ArrayList} of {@link Article} objects may be passed inside
+ * {@link android.os.Bundle} objects.
  */
-public class Article {
+public class Article implements Parcelable {
+
+    /**
+     * {@link android.os.Parcelable.Creator} object that generates instances of this class from
+     * a {@link Parcelable} object.
+     */
+    public static final Creator<Article> CREATOR = new Creator<Article>() {
+        @Override
+        public Article createFromParcel(Parcel in) {
+            return new Article(in);
+        }
+
+        @Override
+        public Article[] newArray(int size) {
+            return new Article[size];
+        }
+    };
 
     /**
      * {@link String} representing the title of the article.
@@ -41,6 +62,19 @@ public class Article {
     }
 
     /**
+     * Constructs a new {@link Article} object.
+     *
+     * @param in {@link Parcelable} object that contains the member variables of the {@link Article}
+     *           object to be constructed.
+     */
+    protected Article(Parcel in) {
+        title = in.readString();
+        sectionName = in.readString();
+        datePublished = in.readString();
+        url = in.readString();
+    }
+
+    /**
      * Returns a {@link String} representing the title of the article.
      *
      * @return {@link String} representing the title of the article.
@@ -74,5 +108,31 @@ public class Article {
      */
     public String getUrl() {
         return url;
+    }
+
+    /**
+     * Returns an int that describes the type of objects contained in this {@link Parcelable}
+     * instance.
+     *
+     * @return An int that describes the type of objects contained in this {@link Parcelable}
+     * instance.
+     */
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    /**
+     * Converts the member variables of this {@link Article} object into a {@link Parcel} object.
+     *
+     * @param dest  {@link Parcel} object where the member variables will be stored.
+     * @param flags Additional flags.
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(title);
+        dest.writeString(sectionName);
+        dest.writeString(datePublished);
+        dest.writeString(url);
     }
 }

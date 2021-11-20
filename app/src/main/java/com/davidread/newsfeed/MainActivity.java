@@ -3,9 +3,11 @@ package com.davidread.newsfeed;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
 import android.webkit.URLUtil;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +19,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,6 +28,15 @@ public class MainActivity extends AppCompatActivity {
      * {@link String} log tag name for {@link MainActivity}.
      */
     public static final String LOG_TAG_NAME = MainActivity.class.getSimpleName();
+
+    /**
+     * {@link String} key constants for identifying data put in instance state {@link Bundle}
+     * objects.
+     */
+    private static final String RECYCLER_VIEW_CONTENT_KEY = "recycler_view_content_key";
+    private static final String RECYCLER_VIEW_POSITION_KEY = "recycler_view_position";
+    private static final String NEXT_ARTICLE_LOADER_ID_KEY = "next_article_loader_id";
+    private static final String NEXT_PAGE_INDEX_KEY = "next_page_index_key";
 
     /**
      * {@link com.davidread.newsfeed.RecyclerViewOnItemClickListener.OnItemClickListener} defines
@@ -83,9 +95,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
-            LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-            int totalItemCount = linearLayoutManager.getItemCount();
-            int lastVisibleItemPosition = linearLayoutManager.findLastVisibleItemPosition();
+            int totalItemCount = layoutManager.getItemCount();
+            int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
             if (lastVisibleItemPosition == totalItemCount - 1) {
                 LoaderManager.getInstance(MainActivity.this).initLoader(nextArticleLoaderId, null, loaderCallbacks);
             }
@@ -180,6 +191,11 @@ public class MainActivity extends AppCompatActivity {
     private ArticleAdapter articleAdapter;
 
     /**
+     * {@link LinearLayoutManager} responsible for positioning views in the {@link RecyclerView}.
+     */
+    private LinearLayoutManager layoutManager;
+
+    /**
      * {@link RecyclerView} for displaying a {@link List} of {@link Article} objects.
      */
     private RecyclerView recyclerView;
@@ -208,10 +224,13 @@ public class MainActivity extends AppCompatActivity {
         // Setup article adapter.
         articleAdapter = new ArticleAdapter();
 
+        // Setup linear layout manager.
+        layoutManager = new LinearLayoutManager(this);
+
         // Setup recycler view.
         recyclerView = findViewById(R.id.article_recycler_view);
         recyclerView.setAdapter(articleAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerView.addOnItemTouchListener(new RecyclerViewOnItemClickListener(this, onItemClickListener));
@@ -224,7 +243,27 @@ public class MainActivity extends AppCompatActivity {
         nextArticleLoaderId = 0;
         nextPageIndex = 1;
 
-        // Start new ArticleLoader.
-        LoaderManager.getInstance(MainActivity.this).initLoader(nextArticleLoaderId, null, loaderCallbacks);
+        // Start new ArticleLoader if not restoring an instance state.
+        if (savedInstanceState == null) {
+            LoaderManager.getInstance(MainActivity.this).initLoader(nextArticleLoaderId, null, loaderCallbacks);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(RECYCLER_VIEW_CONTENT_KEY, (ArrayList<? extends Parcelable>) articleAdapter.getArticles());
+        outState.putInt(RECYCLER_VIEW_POSITION_KEY, layoutManager.findFirstVisibleItemPosition());
+        outState.putInt(NEXT_ARTICLE_LOADER_ID_KEY, nextArticleLoaderId);
+        outState.putInt(NEXT_PAGE_INDEX_KEY, nextPageIndex);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        articleAdapter.addAllArticles(savedInstanceState.getParcelableArrayList(RECYCLER_VIEW_CONTENT_KEY));
+        layoutManager.scrollToPosition(savedInstanceState.getInt(RECYCLER_VIEW_POSITION_KEY));
+        nextArticleLoaderId = savedInstanceState.getInt(NEXT_ARTICLE_LOADER_ID_KEY);
+        nextPageIndex = savedInstanceState.getInt(NEXT_PAGE_INDEX_KEY);
     }
 }

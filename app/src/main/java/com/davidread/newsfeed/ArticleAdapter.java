@@ -152,6 +152,15 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     /**
+     * Returns the {@link List} of {@link Article} objects stored in the adapter.
+     *
+     * @return {@link List} of {@link Article} objects stored in the adapter.
+     */
+    public List<Article> getArticles() {
+        return articles;
+    }
+
+    /**
      * Adds a {@link List} of {@link Article} objects to the end of the {@link List} of objects
      * being adapted.
      *
