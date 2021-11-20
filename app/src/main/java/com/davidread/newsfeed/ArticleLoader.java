@@ -55,11 +55,6 @@ public class ArticleLoader extends AsyncTaskLoader<List<Article>> {
     private final String query;
 
     /**
-     * {@link List} of {@link Article} objects returned from The Guardian API request.
-     */
-    private List<Article> articles;
-
-    /**
      * Constructs a new {@link ArticleLoader} object.
      *
      * @param context   {@link Context} for the superclass.
@@ -73,7 +68,6 @@ public class ArticleLoader extends AsyncTaskLoader<List<Article>> {
         this.pageIndex = pageIndex;
         this.orderBy = orderBy;
         this.query = query;
-        this.articles = null;
     }
 
     /**
@@ -88,20 +82,12 @@ public class ArticleLoader extends AsyncTaskLoader<List<Article>> {
 
     /**
      * Callback method invoked to perform the actual load on a worker thread and return the result.
-     * First, it'll fetch a {@link List} of {@link Article} objects via The Guardian API and store
-     * it globally in this {@link ArticleLoader}. Then, it'll return this {@link List}.
+     * It simply returns {@link ArticleLoader#getArticlesFromTheGuardianAPI(String, int, String)}.
      */
     @Nullable
     @Override
     public List<Article> loadInBackground() {
-
-        // Fetch List of Article objects from The Guardian API if they have not already been fetched.
-        if (articles == null || articles.isEmpty()) {
-            articles = getArticlesFromTheGuardianAPI(orderBy, pageIndex, query);
-        }
-
-        // Return List of Article objects stored globally in this ArticleLoader object.
-        return articles;
+        return getArticlesFromTheGuardianAPI(orderBy, pageIndex, query);
     }
 
     /**
@@ -124,6 +110,7 @@ public class ArticleLoader extends AsyncTaskLoader<List<Article>> {
         try {
             json = getJsonFromUrl(url);
         } catch (IOException e) {
+            cancelLoad();
             Log.e(LOG_TAG_NAME, "Error closing input stream", e);
         }
 
@@ -161,6 +148,7 @@ public class ArticleLoader extends AsyncTaskLoader<List<Article>> {
         try {
             url = new URL(stringUrl);
         } catch (MalformedURLException e) {
+            cancelLoad();
             Log.e(LOG_TAG_NAME, "Error constructing URL object", e);
         }
         return url;
@@ -195,10 +183,12 @@ public class ArticleLoader extends AsyncTaskLoader<List<Article>> {
                 inputStream = httpURLConnection.getInputStream();
                 json = parseJsonFromInputStream(inputStream);
             } else {
+                cancelLoad();
                 Log.e(LOG_TAG_NAME, "Network request failed with response code " + responseCode);
             }
 
         } catch (IOException e) {
+            cancelLoad();
             Log.e(LOG_TAG_NAME, "Error performing network request", e);
         } finally {
             // Cleanup network request objects.
@@ -240,6 +230,10 @@ public class ArticleLoader extends AsyncTaskLoader<List<Article>> {
      */
     private List<Article> extractArticlesFromJson(String json) {
 
+        if (json == null) {
+            cancelLoad();
+        }
+
         List<Article> articles = new ArrayList<>();
 
         // Get results JSON array from the JSON string.
@@ -249,27 +243,20 @@ public class ArticleLoader extends AsyncTaskLoader<List<Article>> {
             JSONObject responseJsonObject = rootJsonObject.getJSONObject("response");
             resultsJsonArray = responseJsonObject.getJSONArray("results");
         } catch (JSONException e) {
+            cancelLoad();
             Log.e(LOG_TAG_NAME, "Error parsing the results JSON array", e);
-        }
-
-        // Return early if a null results JSON array is parsed.
-        if (resultsJsonArray == null) {
-            return null;
         }
 
         // Iterate through the results JSON array.
         for (int resultsIndex = 0; resultsIndex < resultsJsonArray.length(); resultsIndex++) {
 
             // Get the current result object.
-            JSONObject resultJSONObject = null;
+            JSONObject resultJSONObject;
             try {
                 resultJSONObject = resultsJsonArray.getJSONObject(resultsIndex);
             } catch (JSONException e) {
                 Log.e(LOG_TAG_NAME, "Error parsing the result JSON object with index " + resultsIndex, e);
-            }
-
-            // Skip to the next result if a null current result is parsed.
-            if (resultJSONObject == null) {
+                // Skip to the next result if a null current result is parsed.
                 continue;
             }
 

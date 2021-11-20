@@ -14,20 +14,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:textAppearanceMedium"
-        tools:text="Ecuador: 68 inmates killed and 25 injured in latest prison massacre" />
+        tools:text="Kyle Rittenhouse Sentenced To 45 Years Of CPAC Appearances" />
 
     <TextView
         android:id="@+id/section_name_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:textAppearanceSmall"
-        tools:text="World news" />
+        tools:text="US news" />
 
     <TextView
         android:id="@+id/date_published_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:textAppearanceSmall"
-        tools:text="2021-11-13T22:30:30Z" />
+        tools:text="2021-11-19T12:13:30Z" />
 
 </LinearLayout>

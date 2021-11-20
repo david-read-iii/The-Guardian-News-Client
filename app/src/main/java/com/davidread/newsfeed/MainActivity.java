@@ -32,9 +32,11 @@ public class MainActivity extends AppCompatActivity {
     private final RecyclerViewOnItemClickListener.OnItemClickListener onItemClickListener = new RecyclerViewOnItemClickListener.OnItemClickListener() {
 
         /**
-         * Handles itemClick event. On this event, start an intent to open the browser. The URL of
-         * the site will be determined by the {@link Article} object associated with the clicked
-         * item.
+         * Handles itemClick event. On this event, the view type of the clicked item view will be
+         * evaluated. If the view type is {@link ArticleAdapter#VIEW_TYPE_ARTICLE}, then an intent
+         * to open the URL associated with the corresponding {@link Article} object will be started.
+         * If the view type is {@link ArticleAdapter#VIEW_TYPE_ERROR}, then the error view will be
+         * hidden and a new {@link ArticleLoader} will be initialized.
          *
          * @param view     {@link View} within the {@link RecyclerView} that was clicked.
          * @param position int representing the position of the view within the adapter.
@@ -42,22 +44,27 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onItemClick(View view, int position, int viewType) {
 
-            // Do nothing if the view type is not an article view.
-            if (viewType != ArticleAdapter.VIEW_TYPE_ARTICLE) {
-                return;
+            if (viewType == ArticleAdapter.VIEW_TYPE_ARTICLE) {
+
+                Article article = (Article) articleAdapter.getArticle(position);
+                String url = article.getUrl();
+
+                // Do nothing if the provided URL is invalid.
+                if (url == null || !URLUtil.isValidUrl(url)) {
+                    return;
+                }
+
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(url));
+                startActivity(intent);
             }
 
-            Article article = (Article) articleAdapter.getArticle(position);
-            String url = article.getUrl();
-
-            // Do nothing if the provided URL is invalid.
-            if (url == null || !URLUtil.isValidUrl(url)) {
-                return;
+            else if (viewType == ArticleAdapter.VIEW_TYPE_ERROR) {
+                articleAdapter.hideErrorView();
+                recyclerView.addOnScrollListener(onScrollListener);
+                LoaderManager.getInstance(MainActivity.this).initLoader(nextArticleLoaderId, null, loaderCallbacks);
             }
 
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(url));
-            startActivity(intent);
         }
     };
 
@@ -95,8 +102,9 @@ public class MainActivity extends AppCompatActivity {
     private final LoaderManager.LoaderCallbacks<List<Article>> loaderCallbacks = new LoaderManager.LoaderCallbacks<List<Article>>() {
 
         /**
-         * Handles createLoader event. On this event, return a new {@link ArticleLoader} object with
-         * the appropriate parameters.
+         * Handles createLoader event. On this event, show a loading view in the
+         * {@link RecyclerView} and return a new {@link ArticleLoader} object with the appropriate
+         * parameters and listeners set onto it.
          *
          * @param id    int id of the {@link ArticleLoader} to be created.
          * @param args  {@link Bundle} object containing optional arguments for the
@@ -107,11 +115,14 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public Loader<List<Article>> onCreateLoader(int id, @Nullable Bundle args) {
             articleAdapter.showLoadingView();
-            return new ArticleLoader(MainActivity.this, "newest", nextPageIndex, null);
+            ArticleLoader articleLoader = new ArticleLoader(MainActivity.this, "newest", nextPageIndex, null);
+            articleLoader.registerOnLoadCanceledListener(onLoadCanceledListener);
+            return articleLoader;
         }
 
         /**
-         * Handles loadFinished event. On this event, add the {@link List} returned by the completed
+         * Handles loadFinished event. On this event, hide the loading view in the
+         * {@link RecyclerView} and add the {@link List} returned by the completed
          * {@link ArticleLoader} to the {@link ArticleAdapter}. Then, increment the
          * nextArticleLoaderId and nextPageIndex global variables for future {@link ArticleLoader}
          * objects. Finally, destroy the completed {@link ArticleLoader}.
@@ -131,6 +142,28 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onLoaderReset(@NonNull Loader<List<Article>> loader) {
+        }
+    };
+
+    /**
+     * {@link Loader.OnLoadCanceledListener} object that defines how an {@link ArticleLoader}
+     * handles its loadCanceled event.
+     */
+    private final Loader.OnLoadCanceledListener<List<Article>> onLoadCanceledListener = new Loader.OnLoadCanceledListener<List<Article>>() {
+
+        /**
+         * Handles loadCanceled event. On this event, show an error view in the
+         * {@link RecyclerView}, remove the scroll listener from the {@link RecyclerView}, and
+         * destroy the canceled {@link ArticleLoader}.
+         *
+         * @param loader    {@link Loader} object that was canceled.
+         */
+        @Override
+        public void onLoadCanceled(@NonNull Loader<List<Article>> loader) {
+            articleAdapter.hideLoadingView();
+            articleAdapter.showErrorView();
+            recyclerView.removeOnScrollListener(onScrollListener);
+            LoaderManager.getInstance(MainActivity.this).destroyLoader(loader.getId());
         }
     };
 

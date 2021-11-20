@@ -13,7 +13,8 @@ import java.util.List;
 
 /**
  * {@link ArticleAdapter} is an adapter class that provides a binding from a {@link List} of
- * {@link Article} objects to views that are displayed within a {@link RecyclerView}.
+ * {@link Article} objects to views that are displayed within a {@link RecyclerView}. It also
+ * allows loading and error views to be shown below the adapted {@link Article} objects.
  */
 public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -22,6 +23,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
      */
     public static final int VIEW_TYPE_ARTICLE = 0;
     public static final int VIEW_TYPE_LOADING = 1;
+    public static final int VIEW_TYPE_ERROR = 2;
 
     /**
      * {@link List} of {@link Article} objects being adapted.
@@ -35,16 +37,23 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private boolean loadingViewVisible;
 
     /**
+     * Boolean representing whether an error view is being adapted at the end of the
+     * {@link RecyclerView}.
+     */
+    private boolean errorViewVisible;
+
+    /**
      * Constructs a new {@link ArticleAdapter} object.
      */
     public ArticleAdapter() {
         this.articles = new ArrayList<>();
         this.loadingViewVisible = false;
+        this.errorViewVisible = false;
     }
 
     /**
      * Called when the {@link RecyclerView} needs a new {@link RecyclerView.ViewHolder} to represent
-     * either an {@link Article} object or a loading view.
+     * either an {@link Article} object, a loading view, or an error view.
      *
      * @param parent   {@link ViewGroup} into which the new {@link View} will be added after it is
      *                 bound to an adapter position.
@@ -57,9 +66,12 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         if (viewType == VIEW_TYPE_ARTICLE) {
             View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_article, parent, false);
             return new ArticleViewHolder(itemView);
-        } else {
+        } else if (viewType == VIEW_TYPE_LOADING) {
             View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_loading, parent, false);
             return new LoadingViewHolder(itemView);
+        } else {
+            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_error, parent, false);
+            return new ErrorViewHolder(itemView);
         }
     }
 
@@ -74,8 +86,8 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof ArticleViewHolder) {
-            Article article = articles.get(position);
             ArticleViewHolder articleViewHolder = (ArticleViewHolder) holder;
+            Article article = articles.get(position);
             articleViewHolder.getTitleTextView().setText(article.getTitle());
             articleViewHolder.getSectionNameTextView().setText(article.getSectionName());
             articleViewHolder.getDatePublishedTextView().setText(article.getDatePublished());
@@ -84,17 +96,20 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     /**
      * Returns the total number of items this adapter is adapting. Items include the {@link Article}
-     * objects and the loading view.
+     * objects, the loading view, and the error view.
      *
      * @return The total number of items this adapter is adapting.
      */
     @Override
     public int getItemCount() {
+        int itemCount = articles.size();
         if (loadingViewVisible) {
-            return articles.size() + 1;
-        } else {
-            return articles.size();
+            itemCount++;
         }
+        if (errorViewVisible) {
+            itemCount++;
+        }
+        return itemCount;
     }
 
     /**
@@ -107,8 +122,10 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public int getItemViewType(int position) {
         if (position < articles.size()) {
             return VIEW_TYPE_ARTICLE;
-        } else {
+        } else if (loadingViewVisible) {
             return VIEW_TYPE_LOADING;
+        } else {
+            return VIEW_TYPE_ERROR;
         }
     }
 
@@ -142,9 +159,18 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     /**
-     * Adds a loading view to the end of the adapter.
+     * Adds a loading view to the end of the adapter. Hides the error view if it is visible.
      */
     public void showLoadingView() {
+
+        // Do nothing if the loading view is already visible.
+        if (loadingViewVisible) {
+            return;
+        }
+
+        if (errorViewVisible) {
+            hideErrorView();
+        }
         loadingViewVisible = true;
         notifyItemInserted(getItemCount() - 1);
     }
@@ -153,7 +179,44 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
      * Removes the loading view from the end of the adapter.
      */
     public void hideLoadingView() {
+
+        // Do nothing if the loading view is already hidden.
+        if (!loadingViewVisible) {
+            return;
+        }
+
         loadingViewVisible = false;
+        notifyItemRemoved(getItemCount());
+    }
+
+    /**
+     * Adds an error view to the end of the adapter. Hides the loading view if it is visible.
+     */
+    public void showErrorView() {
+
+        // Do nothing if the error view is already visible.
+        if (errorViewVisible) {
+            return;
+        }
+
+        if (loadingViewVisible) {
+            hideLoadingView();
+        }
+        errorViewVisible = true;
+        notifyItemInserted(getItemCount() - 1);
+    }
+
+    /**
+     * Removes the error view from the end of the adapter.
+     */
+    public void hideErrorView() {
+
+        // Do nothing if the error view is already hidden.
+        if (!errorViewVisible) {
+            return;
+        }
+
+        errorViewVisible = false;
         notifyItemRemoved(getItemCount());
     }
 
@@ -224,6 +287,22 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
          * @param itemView {@link View} to be held in the {@link LoadingViewHolder}.
          */
         public LoadingViewHolder(@NonNull View itemView) {
+            super(itemView);
+        }
+    }
+
+    /**
+     * {@link ErrorViewHolder} is a model class that describes a single error item view and
+     * metadata about its place within a {@link RecyclerView}.
+     */
+    private static class ErrorViewHolder extends RecyclerView.ViewHolder {
+
+        /**
+         * Constructs a new {@link ErrorViewHolder}.
+         *
+         * @param itemView {@link View} to be held in the {@link ErrorViewHolder}.
+         */
+        public ErrorViewHolder(@NonNull View itemView) {
             super(itemView);
         }
     }

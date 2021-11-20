@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">News Feed</string>
     <string name="empty_list_label">No articles found</string>
+    <string name="error_label">Error fetching articles. Tap to retry.</string>
 </resources>
