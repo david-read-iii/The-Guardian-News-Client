@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.view.Menu;
 import android.view.View;
 import android.webkit.URLUtil;
 import android.widget.TextView;
@@ -258,6 +259,19 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             LoaderManager.getInstance(MainActivity.this).initLoader(nextArticleLoaderId, null, loaderCallbacks);
         }
+    }
+
+    /**
+     * Callback method invoked when this activity needs a new options menu. On this event, inflate
+     * the options menu defined at {@link R.menu#menu_main}.
+     *
+     * @param menu {@link Menu} object in which you place your items.
+     * @return Whether the menu will be displayed.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
     }
 
     /**
