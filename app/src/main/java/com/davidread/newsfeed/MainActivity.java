@@ -7,7 +7,6 @@ import android.os.Parcelable;
 import android.view.View;
 import android.webkit.URLUtil;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,10 +32,12 @@ public class MainActivity extends AppCompatActivity {
      * {@link String} key constants for identifying data put in instance state {@link Bundle}
      * objects.
      */
-    private static final String RECYCLER_VIEW_CONTENT_KEY = "recycler_view_content_key";
-    private static final String RECYCLER_VIEW_POSITION_KEY = "recycler_view_position";
     private static final String NEXT_ARTICLE_LOADER_ID_KEY = "next_article_loader_id";
     private static final String NEXT_PAGE_INDEX_KEY = "next_page_index_key";
+    private static final String EMPTY_LIST_TEXT_VIEW_VISIBILITY_KEY = "empty_list_text_view_visibility";
+    private static final String RECYCLER_VIEW_CONTENT_KEY = "recycler_view_content_key";
+    private static final String RECYCLER_VIEW_FOOTER_VIEW_TYPE_KEY = "recycler_view_footer_view_type";
+    private static final String RECYCLER_VIEW_POSITION_KEY = "recycler_view_position";
 
     /**
      * {@link com.davidread.newsfeed.RecyclerViewOnItemClickListener.OnItemClickListener} defines
@@ -123,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public Loader<List<Article>> onCreateLoader(int id, @Nullable Bundle args) {
             articleAdapter.showFooterView(ArticleAdapter.VIEW_TYPE_LOADING);
+            layoutManager.scrollToPosition(articleAdapter.getItemCount() - 1);
             ArticleLoader articleLoader = new ArticleLoader(MainActivity.this, "newest", nextPageIndex, null);
             articleLoader.registerOnLoadCanceledListener(onLoadCanceledListener);
             return articleLoader;
@@ -216,6 +218,15 @@ public class MainActivity extends AppCompatActivity {
      */
     private int nextPageIndex;
 
+    /**
+     * Callback method invoked exactly once when this activity is created. On this event, setup the
+     * {@link RecyclerView} and its helper objects, setup the empty list {@link TextView},
+     * initialize the global {@link ArticleLoader} variables, and initialize a new
+     * {@link ArticleLoader} object.
+     *
+     * @param savedInstanceState {@link Bundle} object where instance state from a previous
+     *                           configuration change is stored.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -249,21 +260,49 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Callback method invoked when this activity needs to save its instance state before a possible
+     * configuration change. On this event, save the state of the global {@link ArticleLoader}
+     * variables, the empty list {@link TextView}, and the {@link RecyclerView}.
+     *
+     * @param outState {@link Bundle} object where the instance state is saved.
+     */
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(RECYCLER_VIEW_CONTENT_KEY, (ArrayList<? extends Parcelable>) articleAdapter.getArticles());
-        outState.putInt(RECYCLER_VIEW_POSITION_KEY, layoutManager.findFirstVisibleItemPosition());
         outState.putInt(NEXT_ARTICLE_LOADER_ID_KEY, nextArticleLoaderId);
         outState.putInt(NEXT_PAGE_INDEX_KEY, nextPageIndex);
+        outState.putInt(EMPTY_LIST_TEXT_VIEW_VISIBILITY_KEY, emptyListTextView.getVisibility());
+        outState.putParcelableArrayList(RECYCLER_VIEW_CONTENT_KEY, (ArrayList<? extends Parcelable>) articleAdapter.getArticles());
+        outState.putInt(RECYCLER_VIEW_FOOTER_VIEW_TYPE_KEY, articleAdapter.getItemViewType(articleAdapter.getItemCount() - 1));
+        outState.putInt(RECYCLER_VIEW_POSITION_KEY, layoutManager.findFirstVisibleItemPosition());
     }
 
+    /**
+     * Callback method invoked after a configuration change. On this event, restore the state of
+     * the global {@link ArticleLoader} variables, the empty list {@link TextView}, and the
+     * {@link RecyclerView}.
+     *
+     * @param savedInstanceState {@link Bundle} object where instance state is restored from.
+     */
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        articleAdapter.addAllArticles(savedInstanceState.getParcelableArrayList(RECYCLER_VIEW_CONTENT_KEY));
-        layoutManager.scrollToPosition(savedInstanceState.getInt(RECYCLER_VIEW_POSITION_KEY));
         nextArticleLoaderId = savedInstanceState.getInt(NEXT_ARTICLE_LOADER_ID_KEY);
         nextPageIndex = savedInstanceState.getInt(NEXT_PAGE_INDEX_KEY);
+        emptyListTextView.setVisibility(savedInstanceState.getInt(EMPTY_LIST_TEXT_VIEW_VISIBILITY_KEY));
+        articleAdapter.addAllArticles(savedInstanceState.getParcelableArrayList(RECYCLER_VIEW_CONTENT_KEY));
+        layoutManager.scrollToPosition(savedInstanceState.getInt(RECYCLER_VIEW_POSITION_KEY));
+
+        int recyclerViewFooterViewType = savedInstanceState.getInt(RECYCLER_VIEW_FOOTER_VIEW_TYPE_KEY);
+        if (recyclerViewFooterViewType == ArticleAdapter.VIEW_TYPE_LOADING) {
+            LoaderManager.getInstance(MainActivity.this).restartLoader(nextArticleLoaderId, null, loaderCallbacks);
+        } else if (recyclerViewFooterViewType == ArticleAdapter.VIEW_TYPE_ERROR) {
+            articleAdapter.showFooterView(ArticleAdapter.VIEW_TYPE_ERROR);
+            recyclerView.removeOnScrollListener(onScrollListener);
+        } else if (recyclerViewFooterViewType == ArticleAdapter.VIEW_TYPE_END_OF_LIST) {
+            articleAdapter.showFooterView(ArticleAdapter.VIEW_TYPE_END_OF_LIST);
+            recyclerView.removeOnScrollListener(onScrollListener);
+        }
     }
 }

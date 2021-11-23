@@ -9,7 +9,9 @@
         <item name="colorSecondaryVariant">@color/secondary_dark</item>
         <item name="colorOnSecondary">@color/black</item>
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:navigationBarColor">?attr/colorPrimaryVariant</item>
         <item name="toolbarStyle">@style/Toolbar</item>
+        <item name="android:colorEdgeEffect">?attr/colorSecondary</item>
     </style>
 
     <!-- Toolbar theme. -->
