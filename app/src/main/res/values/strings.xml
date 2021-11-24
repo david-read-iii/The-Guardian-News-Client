@@ -4,4 +4,5 @@
     <string name="error_label">Error fetching articles. Tap to retry.</string>
     <string name="end_of_list_label">No more articles.</string>
     <string name="action_settings_label">Settings</string>
+    <string name="settings_activity_label">Search Settings</string>
 </resources>
