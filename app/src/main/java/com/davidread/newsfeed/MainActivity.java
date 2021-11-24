@@ -285,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         Intent intent = new Intent(this, SettingsActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, 0);
         return true;
     }
 
@@ -333,5 +333,26 @@ public class MainActivity extends AppCompatActivity {
             articleAdapter.showFooterView(ArticleAdapter.VIEW_TYPE_END_OF_LIST);
             recyclerView.removeOnScrollListener(onScrollListener);
         }
+    }
+
+    /**
+     * Callback method invoked after a child activity finishes. On this event, reset the UI, reset
+     * the nextPageIndex global variable, and initialize a new {@link ArticleLoader} object.
+     *
+     * @param requestCode The integer request code originally supplied to startActivityForResult(),
+     *                    allowing you to identify who this result came from.
+     * @param resultCode  The integer result code returned by the child activity through its
+     *                    setResult().
+     * @param data        An Intent, which can return result data to the caller (various data can be
+     *                    attached to Intent "extras").
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        articleAdapter.resetArticles();
+        articleAdapter.hideFooterView();
+        emptyListTextView.setVisibility(View.INVISIBLE);
+        nextPageIndex = 1;
+        LoaderManager.getInstance(MainActivity.this).initLoader(nextArticleLoaderId, null, loaderCallbacks);
     }
 }

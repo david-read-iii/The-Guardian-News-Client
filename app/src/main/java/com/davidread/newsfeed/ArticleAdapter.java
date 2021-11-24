@@ -175,8 +175,9 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
      * Resets the {@link List} of objects being adapted.
      */
     public void resetArticles() {
-        this.articles = new ArrayList<>();
-        notifyItemRangeRemoved(0, getItemCount());
+        int articlesItemCount = articles.size();
+        articles = new ArrayList<>();
+        notifyItemRangeRemoved(0, articlesItemCount);
     }
 
     /**
