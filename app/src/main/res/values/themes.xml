@@ -10,14 +10,22 @@
         <item name="colorOnSecondary">@color/black</item>
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <item name="android:navigationBarColor">?attr/colorPrimaryVariant</item>
-        <item name="toolbarStyle">@style/Toolbar</item>
         <item name="android:colorEdgeEffect">?attr/colorSecondary</item>
+        <item name="toolbarStyle">@style/Toolbar</item>
+        <item name="actionButtonStyle">@style/ToolbarButtonStyle</item>
+        <item name="toolbarNavigationButtonStyle">@style/ToolbarButtonStyle</item>
+        <item name="homeAsUpIndicator">@drawable/ic_back_button</item>
     </style>
 
     <!-- Toolbar theme. -->
     <style name="Toolbar" parent="Widget.MaterialComponents.Toolbar">
         <item name="android:background">?attr/colorPrimary</item>
         <item name="titleTextColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <!-- Toolbar button style. -->
+    <style name="ToolbarButtonStyle" parent="Widget.AppCompat.ActionButton">
+        <item name="android:background">@drawable/action_button_ripple</item>
     </style>
 
 </resources>

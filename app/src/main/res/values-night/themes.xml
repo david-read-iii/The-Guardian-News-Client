@@ -10,8 +10,11 @@
         <item name="colorOnSecondary">@color/black</item>
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <item name="android:navigationBarColor">?attr/colorPrimaryVariant</item>
-        <item name="toolbarStyle">@style/Toolbar</item>
         <item name="android:colorEdgeEffect">?attr/colorSecondary</item>
+        <item name="toolbarStyle">@style/Toolbar</item>
+        <item name="actionButtonStyle">@style/ToolbarButtonStyle</item>
+        <item name="toolbarNavigationButtonStyle">@style/ToolbarButtonStyle</item>
+        <item name="homeAsUpIndicator">@drawable/ic_back_button</item>
     </style>
 
 </resources>
