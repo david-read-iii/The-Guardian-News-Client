@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ListPreference
+        app:defaultValue="@string/order_by_newest_value"
+        app:entries="@array/order_by_labels"
+        app:entryValues="@array/order_by_values"
+        app:icon="@drawable/ic_order_by_black"
+        app:key="@string/order_by_key"
+        app:title="@string/order_by_label" />
+
+    <EditTextPreference
+        app:defaultValue=""
+        app:icon="@drawable/ic_search_term_black"
+        app:key="@string/search_term_key"
+        app:title="@string/search_term_label" />
+
+</androidx.preference.PreferenceScreen>
