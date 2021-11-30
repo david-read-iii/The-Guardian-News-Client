@@ -11,23 +11,23 @@
 
     <TextView
         android:id="@+id/title_text_view"
+        style="@style/PrimaryTextViewStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:textAppearanceMedium"
         tools:text="Kyle Rittenhouse Sentenced To 45 Years Of CPAC Appearances" />
 
     <TextView
         android:id="@+id/section_name_text_view"
+        style="@style/SecondaryTextViewStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:textAppearanceSmall"
         tools:text="US news" />
 
     <TextView
         android:id="@+id/date_published_text_view"
+        style="@style/SecondaryTextViewStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:textAppearanceSmall"
         tools:text="2021-11-19T12:13:30Z" />
 
 </LinearLayout>

@@ -28,4 +28,15 @@
         <item name="android:background">@drawable/action_button_ripple</item>
     </style>
 
+    <!-- Primary TextView style. -->
+    <style name="PrimaryTextViewStyle" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">?android:attr/textAppearanceListItem</item>
+    </style>
+
+    <!-- Secondary TextView style. -->
+    <style name="SecondaryTextViewStyle" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+    </style>
+
 </resources>

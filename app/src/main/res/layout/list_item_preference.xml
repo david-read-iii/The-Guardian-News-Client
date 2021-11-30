@@ -41,15 +41,15 @@
 
         <TextView
             android:id="@android:id/title"
+            style="@style/PrimaryTextViewStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="marquee"
-            android:singleLine="true"
-            android:textAppearance="?android:attr/textAppearanceListItem" />
+            android:singleLine="true" />
 
         <TextView
             android:id="@android:id/summary"
-            style="@style/PreferenceSummaryTextStyle"
+            style="@style/SecondaryTextViewStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@android:id/title"
