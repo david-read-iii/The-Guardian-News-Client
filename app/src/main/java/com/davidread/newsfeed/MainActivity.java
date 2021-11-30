@@ -295,17 +295,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Callback method invoked when an options menu item is clicked. On this event, start an intent
-     * to start the {@link SettingsActivity}.
+     * Callback method invoked when an options menu item is clicked. On this event, check which
+     * menu item is clicked. If it's the refresh action, call
+     * {@link MainActivity#onActivityResult(int, int, Intent)} to refresh the list. If it's the
+     * settings action, create an intent for the {@link SettingsActivity}.
      *
      * @param item {@link MenuItem} that was clicked.
      * @return False to allow normal menu processing to proceed. True to consume it here.
      */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Intent intent = new Intent(this, SettingsActivity.class);
-        startActivityForResult(intent, 0);
-        return true;
+        int selectedOptionsItemId = item.getItemId();
+        if (selectedOptionsItemId == R.id.action_refresh) {
+            onActivityResult(0, 0, null);
+            return true;
+        } else if (selectedOptionsItemId == R.id.action_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivityForResult(intent, 0);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

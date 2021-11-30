@@ -6,12 +6,12 @@
         android:id="@+id/action_refresh"
         android:icon="@drawable/ic_refresh"
         android:title="@string/action_refresh_label"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_action_settings"
         android:title="@string/action_settings_label"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
 
 </menu>

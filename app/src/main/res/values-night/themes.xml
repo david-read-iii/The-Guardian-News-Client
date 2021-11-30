@@ -15,6 +15,7 @@
         <item name="actionButtonStyle">@style/ToolbarButtonStyle</item>
         <item name="toolbarNavigationButtonStyle">@style/ToolbarButtonStyle</item>
         <item name="homeAsUpIndicator">@drawable/ic_back_button</item>
+        <item name="actionOverflowButtonStyle">@style/ToolbarOverflowButtonStyle</item>
     </style>
 
 </resources>

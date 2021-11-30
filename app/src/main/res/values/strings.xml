@@ -7,6 +7,7 @@
     <string name="main_activity_no_search_label">All Articles Ordered By %1$s</string>
     <string name="main_activity_search_label">\"%1$s\" Ordered By %2$s</string>
     <string name="settings_activity_label">Search Settings</string>
+    <string name="action_refresh_label">Refresh</string>
     <string name="action_settings_label">Settings</string>
 
     <!-- Recycler view strings. -->
