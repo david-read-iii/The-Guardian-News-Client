@@ -3,18 +3,21 @@
     <!-- App name. -->
     <string name="app_name">News Feed</string>
 
+    <!-- Action bar strings. -->
+    <string name="main_activity_no_search_label">All Articles Ordered By %1$s</string>
+    <string name="main_activity_search_label">\"%1$s\" Ordered By %2$s</string>
+    <string name="settings_activity_label">Search Settings</string>
+    <string name="action_settings_label">Settings</string>
+
     <!-- Recycler view strings. -->
     <string name="empty_list_label">No articles found.</string>
     <string name="error_label">Error fetching articles. Tap to retry.</string>
     <string name="end_of_list_label">No more articles.</string>
 
-    <!-- General settings strings. -->
-    <string name="action_settings_label">Settings</string>
-    <string name="settings_activity_label">Search Settings</string>
-
     <!-- Order by setting strings. -->
     <string name="order_by_label">Order By</string>
     <string name="order_by_key" translatable="false">order_by</string>
+    <string name="order_by_default_value" translatable="false">@string/order_by_newest_value</string>
     <string name="order_by_newest_label">Newest</string>
     <string name="order_by_newest_value" translatable="false">newest</string>
     <string name="order_by_oldest_label">Oldest</string>
@@ -25,6 +28,7 @@
     <!-- Search term setting strings. -->
     <string name="search_term_label">Search Term</string>
     <string name="search_term_key" translatable="false">search_term</string>
+    <string name="search_term_default_value" translatable="false"></string>
     <string name="search_term_empty_label">No search term defined</string>
 
 </resources>

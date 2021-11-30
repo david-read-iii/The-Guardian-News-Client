@@ -3,7 +3,7 @@
 
     <ListPreference
         app:allowDividerBelow="true"
-        app:defaultValue="@string/order_by_newest_value"
+        app:defaultValue="@string/order_by_default_value"
         app:entries="@array/order_by_labels"
         app:entryValues="@array/order_by_values"
         app:icon="@drawable/ic_order_by_white"
@@ -14,7 +14,7 @@
     <EditTextPreference
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
-        app:defaultValue=""
+        app:defaultValue="@string/search_term_default_value"
         app:icon="@drawable/ic_search_term_white"
         app:key="@string/search_term_key"
         app:layout="@layout/list_item_preference"

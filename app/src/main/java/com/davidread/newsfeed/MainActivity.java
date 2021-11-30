@@ -1,6 +1,7 @@
 package com.davidread.newsfeed;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -15,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -113,9 +115,8 @@ public class MainActivity extends AppCompatActivity {
     private final LoaderManager.LoaderCallbacks<List<Article>> loaderCallbacks = new LoaderManager.LoaderCallbacks<List<Article>>() {
 
         /**
-         * Handles createLoader event. On this event, show a loading view in the
-         * {@link RecyclerView} and return a new {@link ArticleLoader} object with the appropriate
-         * parameters and listeners set onto it.
+         * Handles createLoader event. On this event, update the UI to a loading state, get the user
+         * preferences for order by and search term, and return a new {@link ArticleLoader} object.
          *
          * @param id    int id of the {@link ArticleLoader} to be created.
          * @param args  {@link Bundle} object containing optional arguments for the
@@ -125,9 +126,18 @@ public class MainActivity extends AppCompatActivity {
         @NonNull
         @Override
         public Loader<List<Article>> onCreateLoader(int id, @Nullable Bundle args) {
+
+            // Update UI to loading.
             articleAdapter.showFooterView(ArticleAdapter.VIEW_TYPE_LOADING);
             layoutManager.scrollToPosition(articleAdapter.getItemCount() - 1);
-            ArticleLoader articleLoader = new ArticleLoader(MainActivity.this, "newest", nextPageIndex, null);
+
+            // Get user preferences for order by and search term from SharedPreferences.
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+            String orderByPreferenceValue = sharedPreferences.getString(getString(R.string.order_by_key), getString(R.string.order_by_default_value));
+            String searchTermPreferenceValue = sharedPreferences.getString(getString(R.string.search_term_key), getString(R.string.search_term_default_value));
+
+            // Return a new ArticleLoader object.
+            ArticleLoader articleLoader = new ArticleLoader(MainActivity.this, orderByPreferenceValue, nextPageIndex, searchTermPreferenceValue);
             articleLoader.registerOnLoadCanceledListener(onLoadCanceledListener);
             return articleLoader;
         }
@@ -146,6 +156,8 @@ public class MainActivity extends AppCompatActivity {
          */
         @Override
         public void onLoadFinished(@NonNull Loader<List<Article>> loader, List<Article> data) {
+
+            // Update UI.
             articleAdapter.hideFooterView();
             articleAdapter.addAllArticles(data);
             if (data.isEmpty()) {
@@ -156,8 +168,12 @@ public class MainActivity extends AppCompatActivity {
                     articleAdapter.showFooterView(ArticleAdapter.VIEW_TYPE_END_OF_LIST);
                 }
             }
+
+            // Increment global variables.
             nextArticleLoaderId++;
             nextPageIndex++;
+
+            // Destroy ArticleLoader.
             LoaderManager.getInstance(MainActivity.this).destroyLoader(loader.getId());
         }
 
@@ -256,6 +272,9 @@ public class MainActivity extends AppCompatActivity {
         nextArticleLoaderId = 0;
         nextPageIndex = 1;
 
+        // Update action bar title.
+        updateActionBarTitle();
+
         // Start new ArticleLoader if not restoring an instance state.
         if (savedInstanceState == null) {
             LoaderManager.getInstance(MainActivity.this).initLoader(nextArticleLoaderId, null, loaderCallbacks);
@@ -352,7 +371,39 @@ public class MainActivity extends AppCompatActivity {
         articleAdapter.resetArticles();
         articleAdapter.hideFooterView();
         emptyListTextView.setVisibility(View.INVISIBLE);
+        updateActionBarTitle();
         nextPageIndex = 1;
         LoaderManager.getInstance(MainActivity.this).initLoader(nextArticleLoaderId, null, loaderCallbacks);
+    }
+
+    /**
+     * Updates the action bar title of this activity to reflect what order by and search term
+     * preferences the user has selected.
+     */
+    private void updateActionBarTitle() {
+
+        // Get order by and search term preference values from SharedPreferences.
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+        String orderByPreferenceValue = sharedPreferences.getString(getString(R.string.order_by_key), getString(R.string.order_by_default_value));
+        String searchTermPreferenceValue = sharedPreferences.getString(getString(R.string.search_term_key), getString(R.string.search_term_default_value));
+
+        // Get appropriate order by label that corresponds to its value.
+        String orderByPreferenceLabel = "";
+        if (orderByPreferenceValue.equals(getString(R.string.order_by_newest_value))) {
+            orderByPreferenceLabel = getString(R.string.order_by_newest_label);
+        } else if (orderByPreferenceValue.equals(getString(R.string.order_by_oldest_value))) {
+            orderByPreferenceLabel = getString(R.string.order_by_oldest_label);
+        } else if (orderByPreferenceValue.equals(getString(R.string.order_by_relevance_value))) {
+            orderByPreferenceLabel = getString(R.string.order_by_relevance_label);
+        }
+
+        // Update action bar title.
+        if (getSupportActionBar() != null) {
+            if (searchTermPreferenceValue.equals(getString(R.string.search_term_default_value))) {
+                getSupportActionBar().setTitle(getString(R.string.main_activity_no_search_label, orderByPreferenceLabel));
+            } else {
+                getSupportActionBar().setTitle(getString(R.string.main_activity_search_label, searchTermPreferenceValue, orderByPreferenceLabel));
+            }
+        }
     }
 }
