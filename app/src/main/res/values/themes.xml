@@ -14,7 +14,7 @@
         <item name="toolbarStyle">@style/Toolbar</item>
         <item name="actionButtonStyle">@style/ToolbarButtonStyle</item>
         <item name="toolbarNavigationButtonStyle">@style/ToolbarButtonStyle</item>
-        <item name="homeAsUpIndicator">@drawable/ic_back_button</item>
+        <item name="homeAsUpIndicator">@drawable/ic_action_back</item>
         <item name="actionOverflowButtonStyle">@style/ToolbarOverflowButtonStyle</item>
     </style>
 
@@ -26,13 +26,13 @@
 
     <!-- Toolbar button style. -->
     <style name="ToolbarButtonStyle" parent="Widget.AppCompat.ActionButton">
-        <item name="android:background">@drawable/action_button_ripple</item>
+        <item name="android:background">@drawable/toolbar_button_ripple_background</item>
     </style>
 
     <!-- Toolbar overflow button style. -->
     <style name="ToolbarOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
-        <item name="android:background">@drawable/action_button_ripple</item>
-        <item name="android:src">@drawable/ic_overflow</item>
+        <item name="android:background">@drawable/toolbar_button_ripple_background</item>
+        <item name="android:src">@drawable/ic_action_overflow</item>
     </style>
 
     <!-- Primary TextView style. -->
