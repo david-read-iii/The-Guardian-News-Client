@@ -13,11 +13,11 @@
 
     <TextView
         android:id="@+id/empty_list_text_view"
+        style="@style/PrimaryTextViewStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:text="@string/empty_list_label"
-        android:textAppearance="?android:textAppearanceMedium"
         android:visibility="invisible" />
 
 </RelativeLayout>
