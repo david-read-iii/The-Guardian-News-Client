@@ -1,5 +1,6 @@
 package com.davidread.newsfeed;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,8 +9,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * {@link ArticleAdapter} is an adapter class that provides a binding from a {@link List} of
@@ -17,6 +23,11 @@ import java.util.List;
  * allows a single footer view to be shown below the adapted {@link Article} objects.
  */
 public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    /**
+     * {@link String} log tag name for {@link ArticleAdapter}.
+     */
+    public static final String LOG_TAG_NAME = ArticleAdapter.class.getSimpleName();
 
     /**
      * Constants representing the view types that the adapter returns.
@@ -101,7 +112,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             Article article = articles.get(position);
             articleViewHolder.getTitleTextView().setText(article.getTitle());
             articleViewHolder.getSectionNameTextView().setText(article.getSectionName());
-            articleViewHolder.getDatePublishedTextView().setText(article.getDatePublished());
+            articleViewHolder.getDatePublishedTextView().setText(getFormattedDatePublishedString(article.getDatePublished()));
         }
     }
 
@@ -217,6 +228,40 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         } else if (endOfListViewVisible) {
             endOfListViewVisible = false;
             notifyItemRemoved(getItemCount());
+        }
+    }
+
+
+    /**
+     * Returns a {@link String} containing a formatted version of a date published string. This
+     * takes timezone offset and device date format preferences into account.
+     *
+     * @param unformattedString {@link String} containing the date following the
+     *                          "yyyy-MM-dd'T'HH:mm:ss'Z" format pattern and given from the UTC
+     *                          time zone.
+     * @return {@link String} containing the date following the device's preferred date format and
+     * in the device's time zone.
+     */
+    private String getFormattedDatePublishedString(String unformattedString) {
+
+        // Parse a Date object from the unformatted string.
+        Date date = null;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        try {
+            date = simpleDateFormat.parse(unformattedString);
+        } catch (ParseException e) {
+            Log.e(LOG_TAG_NAME, "Error parsing \"" + unformattedString + "\" string");
+        }
+
+        // If parse is successful, return a formatted version of the Date object in the user's locale.
+        if (date != null) {
+            return DateFormat.getDateTimeInstance().format(date);
+        }
+
+        // If parse is unsuccessful, just return the unformatted string.
+        else {
+            return unformattedString;
         }
     }
 
