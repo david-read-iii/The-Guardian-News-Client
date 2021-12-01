@@ -33,4 +33,7 @@
     <string name="search_term_default_value" translatable="false"></string>
     <string name="search_term_empty_label">No search term defined</string>
 
+    <!-- Other strings. -->
+    <string name="no_browser_label">Install a browser app to view the article</string>
+
 </resources>

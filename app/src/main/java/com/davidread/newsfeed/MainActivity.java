@@ -5,11 +5,13 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.URLUtil;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -61,20 +63,33 @@ public class MainActivity extends AppCompatActivity {
          */
         @Override
         public void onItemClick(View view, int position, int viewType) {
+
+            // Case where an article view is clicked.
             if (viewType == ArticleAdapter.VIEW_TYPE_ARTICLE) {
 
                 Article article = (Article) articleAdapter.getArticle(position);
                 String url = article.getUrl();
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(url));
 
-                // Do nothing if the provided URL is invalid.
-                if (url == null || !URLUtil.isValidUrl(url)) {
+                // Do nothing if no browser app is installed on the device.
+                if (intent.resolveActivity(getPackageManager()) == null) {
+                    Log.e(LOG_TAG_NAME, "No browser app installed to handle view intent");
+                    Toast.makeText(MainActivity.this, getString(R.string.no_browser_label), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse(url));
+                // Do nothing if the provided URL is invalid.
+                if (url == null || !URLUtil.isValidUrl(url)) {
+                    Log.e(LOG_TAG_NAME, "Invalid URL string provided by The Guardian API");
+                    return;
+                }
+
                 startActivity(intent);
-            } else if (viewType == ArticleAdapter.VIEW_TYPE_ERROR) {
+            }
+
+            // Case where an error view is clicked.
+            else if (viewType == ArticleAdapter.VIEW_TYPE_ERROR) {
                 articleAdapter.hideFooterView();
                 recyclerView.addOnScrollListener(onScrollListener);
                 LoaderManager.getInstance(MainActivity.this).initLoader(nextArticleLoaderId, null, loaderCallbacks);
