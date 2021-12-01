@@ -2,6 +2,10 @@ plugins {
     id 'com.android.application'
 }
 
+def theGuardianApiKeyPropertiesFile = rootProject.file("theguardianapikey.properties")
+def theGuardianApiKeyProperties = new Properties()
+theGuardianApiKeyProperties.load(new FileInputStream(theGuardianApiKeyPropertiesFile))
+
 android {
     compileSdk 31
 
@@ -13,6 +17,8 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "THE_GUARDIAN_API_KEY", theGuardianApiKeyProperties['THE_GUARDIAN_API_KEY'])
     }
 
     buildTypes {

@@ -37,6 +37,11 @@ public class ArticleLoader extends AsyncTaskLoader<List<Article>> {
     public static final String LOG_TAG_NAME = ArticleLoader.class.getSimpleName();
 
     /**
+     * {@link String} holding the key used to access The Guardian API.
+     */
+    private static final String THE_GUARDIAN_API_KEY = BuildConfig.THE_GUARDIAN_API_KEY;
+
+    /**
      * {@link String} for specifying what order article listings will be returned in. Possible
      * values include "newest", "oldest", and "relevance".
      */
@@ -134,7 +139,7 @@ public class ArticleLoader extends AsyncTaskLoader<List<Article>> {
         uriBuilder.scheme("https")
                 .authority("content.guardianapis.com")
                 .appendPath("search")
-                .appendQueryParameter("api-key", "e2b2fb18-0d25-484d-b3e3-72e4562b3077")
+                .appendQueryParameter("api-key", THE_GUARDIAN_API_KEY)
                 .appendQueryParameter("format", "json")
                 .appendQueryParameter("order-by", orderBy)
                 .appendQueryParameter("page", Integer.toString(pageIndex))
