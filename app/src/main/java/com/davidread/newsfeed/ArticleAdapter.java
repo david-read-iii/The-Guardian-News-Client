@@ -1,5 +1,6 @@
 package com.davidread.newsfeed;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,6 +40,11 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public static final int VIEW_TYPE_END_OF_LIST = 3;
 
     /**
+     * {@link Context} for accessing string resources.
+     */
+    private final Context context;
+
+    /**
      * {@link List} of {@link Article} objects being adapted.
      */
     private List<Article> articles;
@@ -60,8 +66,11 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     /**
      * Constructs a new {@link ArticleAdapter} object.
+     *
+     * @param context {@link Context} for accessing string resources.
      */
-    public ArticleAdapter() {
+    public ArticleAdapter(Context context) {
+        this.context = context;
         this.articles = new ArrayList<>();
         this.loadingViewVisible = false;
         this.errorViewVisible = false;
@@ -111,6 +120,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             ArticleViewHolder articleViewHolder = (ArticleViewHolder) holder;
             Article article = articles.get(position);
             articleViewHolder.getTitleTextView().setText(article.getTitle());
+            articleViewHolder.getAuthorsTextView().setText(getFormattedAuthorsString(article.getAuthors()));
             articleViewHolder.getSectionNameTextView().setText(article.getSectionName());
             articleViewHolder.getDatePublishedTextView().setText(getFormattedDatePublishedString(article.getDatePublished()));
         }
@@ -231,6 +241,29 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
+    /**
+     * Returns a {@link String} containing a formatted version of an authors {@link String} array.
+     * This format simply presents the items of the array in a comma delimited list. If no
+     * authors are in the array, an unknown author string is returned.
+     *
+     * @param authors {@link String} array from a {@link Article} object.
+     * @return {@link String} containing a formatted version of an authors {@link String} array.
+     */
+    private String getFormattedAuthorsString(String[] authors) {
+
+        if (authors.length == 0) {
+            return context.getString(R.string.unknown_author_label);
+        }
+
+        StringBuilder formattedStringBuilder = new StringBuilder();
+        for (int index = 0; index < authors.length; index++) {
+            if (index > 0) {
+                formattedStringBuilder.append(", ");
+            }
+            formattedStringBuilder.append(authors[index]);
+        }
+        return formattedStringBuilder.toString();
+    }
 
     /**
      * Returns a {@link String} containing a formatted version of a date published string. This
@@ -277,6 +310,11 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         private final TextView titleTextView;
 
         /**
+         * {@link TextView} to hold the author of an article.
+         */
+        private final TextView authorsTextView;
+
+        /**
          * {@link TextView} to hold the name of the section the article is from.
          */
         private final TextView sectionNameTextView;
@@ -294,6 +332,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         public ArticleViewHolder(@NonNull View itemView) {
             super(itemView);
             titleTextView = itemView.findViewById(R.id.title_text_view);
+            authorsTextView = itemView.findViewById(R.id.authors_text_view);
             sectionNameTextView = itemView.findViewById(R.id.section_name_text_view);
             datePublishedTextView = itemView.findViewById(R.id.date_published_text_view);
         }
@@ -303,6 +342,13 @@ public class ArticleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
          */
         public TextView getTitleTextView() {
             return titleTextView;
+        }
+
+        /**
+         * Returns the {@link TextView} holding the author of an article.
+         */
+        public TextView getAuthorsTextView() {
+            return authorsTextView;
         }
 
         /**

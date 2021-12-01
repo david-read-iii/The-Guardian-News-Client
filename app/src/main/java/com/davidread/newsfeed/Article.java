@@ -32,6 +32,11 @@ public class Article implements Parcelable {
     private final String title;
 
     /**
+     * {@link String} array representing the author(s) of the article.
+     */
+    private final String[] authors;
+
+    /**
      * {@link String} representing the name of the section the article is from.
      */
     private final String sectionName;
@@ -50,12 +55,14 @@ public class Article implements Parcelable {
      * Constructs a new {@link Article} object.
      *
      * @param title         {@link String} representing the title of the article.
+     * @param authors        {@link String} array representing the author(s) of the article.
      * @param sectionName   {@link String} representing the name of the section the article is from.
      * @param datePublished {@link String} representing the date the article was published.
      * @param url           {@link String} representing a URL that points to the article online.
      */
-    public Article(String title, String sectionName, String datePublished, String url) {
+    public Article(String title, String[] authors, String sectionName, String datePublished, String url) {
         this.title = title;
+        this.authors = authors;
         this.sectionName = sectionName;
         this.datePublished = datePublished;
         this.url = url;
@@ -69,6 +76,7 @@ public class Article implements Parcelable {
      */
     protected Article(Parcel in) {
         title = in.readString();
+        authors = in.createStringArray();
         sectionName = in.readString();
         datePublished = in.readString();
         url = in.readString();
@@ -81,6 +89,15 @@ public class Article implements Parcelable {
      */
     public String getTitle() {
         return title;
+    }
+
+    /**
+     * Returns a {@link String} array representing the author(s) of the article.
+     *
+     * @return {@link String} array representing the author(s) of the article.
+     */
+    public String[] getAuthors() {
+        return authors;
     }
 
     /**
@@ -131,6 +148,7 @@ public class Article implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(title);
+        dest.writeStringArray(authors);
         dest.writeString(sectionName);
         dest.writeString(datePublished);
         dest.writeString(url);

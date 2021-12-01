@@ -17,10 +17,21 @@
         tools:text="Kyle Rittenhouse Sentenced To 45 Years Of CPAC Appearances" />
 
     <TextView
+        android:id="@+id/authors_text_view"
+        style="@style/SecondaryTextViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        tools:text="Peter Baker, Hannah Churchill, Jan Hemmings, Virginia Welch, Piers Wilson" />
+
+    <TextView
         android:id="@+id/section_name_text_view"
         style="@style/SecondaryTextViewStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:ellipsize="marquee"
+        android:singleLine="true"
         tools:text="US news" />
 
     <TextView
@@ -28,6 +39,8 @@
         style="@style/SecondaryTextViewStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:ellipsize="marquee"
+        android:singleLine="true"
         tools:text="2021-11-19T12:13:30Z" />
 
 </LinearLayout>

@@ -50,24 +50,25 @@ public class ArticleLoader extends AsyncTaskLoader<List<Article>> {
 
     /**
      * {@link String} for requesting article listings containing certain free text. To exclude a
-     * query from the request, simply pass this parameter as null or the empty string.
+     * search term from the request, simply pass this parameter as null or the empty string.
      */
-    private final String query;
+    private final String searchTerm;
 
     /**
      * Constructs a new {@link ArticleLoader} object.
      *
-     * @param context   {@link Context} for the superclass.
-     * @param orderBy   {@link String} for specifying what order article listings will be returned
-     *                  in.
-     * @param pageIndex int index for specifying which page result set will be returned.
-     * @param query     {@link String} for requesting article listings containing certain free text.
+     * @param context    {@link Context} for the superclass.
+     * @param orderBy    {@link String} for specifying what order article listings will be returned
+     *                   in.
+     * @param pageIndex  int index for specifying which page result set will be returned.
+     * @param searchTerm {@link String} for requesting article listings containing certain free
+     *                   text.
      */
-    public ArticleLoader(@NonNull Context context, String orderBy, int pageIndex, String query) {
+    public ArticleLoader(@NonNull Context context, String orderBy, int pageIndex, String searchTerm) {
         super(context);
         this.pageIndex = pageIndex;
         this.orderBy = orderBy;
-        this.query = query;
+        this.searchTerm = searchTerm;
     }
 
     /**
@@ -87,23 +88,23 @@ public class ArticleLoader extends AsyncTaskLoader<List<Article>> {
     @Nullable
     @Override
     public List<Article> loadInBackground() {
-        return getArticlesFromTheGuardianAPI(orderBy, pageIndex, query);
+        return getArticlesFromTheGuardianAPI(orderBy, pageIndex, searchTerm);
     }
 
     /**
      * Returns a {@link List} of {@link Article} objects fetched via a network request to The
      * Guardian API.
      *
-     * @param orderBy   {@link String} for specifying what order results will be returned in.
-     * @param pageIndex int index representing which page result set will be returned.
-     * @param query     {@link String} for requesting listings containing this free text.
+     * @param orderBy    {@link String} for specifying what order results will be returned in.
+     * @param pageIndex  int index representing which page result set will be returned.
+     * @param searchTerm {@link String} for requesting listings containing this free text.
      * @return {@link List} of {@link Article} objects fetched via a network request to The Guardian
      * API.
      */
-    private List<Article> getArticlesFromTheGuardianAPI(String orderBy, int pageIndex, String query) {
+    private List<Article> getArticlesFromTheGuardianAPI(String orderBy, int pageIndex, String searchTerm) {
 
         // Construct URL object.
-        URL url = constructUrl(orderBy, pageIndex, query);
+        URL url = constructUrl(orderBy, pageIndex, searchTerm);
 
         // Perform network request.
         String json = null;
@@ -121,12 +122,12 @@ public class ArticleLoader extends AsyncTaskLoader<List<Article>> {
     /**
      * Returns a {@link URL} object for requesting article listings from The Guardian API.
      *
-     * @param orderBy   {@link String} for specifying what order results will be returned in.
-     * @param pageIndex int index representing which page result set will be returned.
-     * @param query     {@link String} for requesting listings containing this free text.
+     * @param orderBy    {@link String} for specifying what order results will be returned in.
+     * @param pageIndex  int index representing which page result set will be returned.
+     * @param searchTerm {@link String} for requesting listings containing this free text.
      * @return {@link URL} object for requesting article listings from The Guardian API.
      */
-    private URL constructUrl(String orderBy, int pageIndex, String query) {
+    private URL constructUrl(String orderBy, int pageIndex, String searchTerm) {
 
         // Construct string URL.
         Uri.Builder uriBuilder = new Uri.Builder();
@@ -137,9 +138,10 @@ public class ArticleLoader extends AsyncTaskLoader<List<Article>> {
                 .appendQueryParameter("format", "json")
                 .appendQueryParameter("order-by", orderBy)
                 .appendQueryParameter("page", Integer.toString(pageIndex))
-                .appendQueryParameter("page-size", "50");
-        if (query != null && !query.isEmpty()) {
-            uriBuilder.appendQueryParameter("q", query);
+                .appendQueryParameter("page-size", "50")
+                .appendQueryParameter("show-tags", "contributor");
+        if (searchTerm != null && !searchTerm.isEmpty()) {
+            uriBuilder.appendQueryParameter("q", searchTerm);
         }
         String stringUrl = uriBuilder.build().toString();
 
@@ -268,6 +270,17 @@ public class ArticleLoader extends AsyncTaskLoader<List<Article>> {
                 Log.e(LOG_TAG_NAME, "Error parsing the webTitle JSON property for the result with index " + resultsIndex, e);
             }
 
+            String[] contributorWebTitles = new String[]{""};
+            try {
+                JSONArray tagsJSONArray = resultJSONObject.getJSONArray("tags");
+                contributorWebTitles = new String[tagsJSONArray.length()];
+                for (int tagsIndex = 0; tagsIndex < tagsJSONArray.length(); tagsIndex++) {
+                    contributorWebTitles[tagsIndex] = tagsJSONArray.getJSONObject(tagsIndex).getString("webTitle");
+                }
+            } catch (JSONException e) {
+                Log.e(LOG_TAG_NAME, "Error parsing the contributor webTitle JSON property for the result with index " + resultsIndex, e);
+            }
+
             String sectionName = "";
             try {
                 sectionName = resultJSONObject.getString("sectionName");
@@ -290,7 +303,7 @@ public class ArticleLoader extends AsyncTaskLoader<List<Article>> {
             }
 
             // Add a new Article object for this result.
-            articles.add(new Article(webTitle, sectionName, webPublicationDate, webUrl));
+            articles.add(new Article(webTitle, contributorWebTitles, sectionName, webPublicationDate, webUrl));
         }
 
         return articles;

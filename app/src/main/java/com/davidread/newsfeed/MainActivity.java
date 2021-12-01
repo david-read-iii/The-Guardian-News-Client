@@ -251,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Setup article adapter.
-        articleAdapter = new ArticleAdapter();
+        articleAdapter = new ArticleAdapter(this);
 
         // Setup linear layout manager.
         layoutManager = new LinearLayoutManager(this);
