@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?><!--
+  ~ This file is modified from a file licensed by The Android Open Source
+  ~ Project. The original copyright notice is below.
+  -->
+<!--
   ~ Copyright (C) 2015 The Android Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,10 +16,6 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
-  -->
-<!--
-  ~ This file is a modified version of the preference_material.xml layout file
-  ~ from the AndroidX Preference library.
   -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
