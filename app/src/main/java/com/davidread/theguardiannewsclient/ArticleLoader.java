@@ -1,4 +1,4 @@
-package com.davidread.newsfeed;
+package com.davidread.theguardiannewsclient;
 
 import android.content.Context;
 import android.net.Uri;
@@ -252,6 +252,10 @@ public class ArticleLoader extends AsyncTaskLoader<List<Article>> {
         } catch (JSONException e) {
             cancelLoad();
             Log.e(LOG_TAG_NAME, "Error parsing the results JSON array", e);
+        }
+
+        if (resultsJsonArray == null) {
+            cancelLoad();
         }
 
         // Iterate through the results JSON array.

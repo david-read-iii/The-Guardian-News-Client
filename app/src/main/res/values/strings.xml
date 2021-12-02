@@ -1,7 +1,8 @@
 <resources>
 
-    <!-- App name. -->
-    <string name="app_name">News Feed</string>
+    <!-- App name strings. -->
+    <string name="app_name">The Guardian News Client</string>
+    <string name="app_name_short">News</string>
 
     <!-- Action bar strings. -->
     <string name="main_activity_no_search_label">All Articles Ordered By %1$s</string>
@@ -30,7 +31,7 @@
     <!-- Search term setting strings. -->
     <string name="search_term_label">Search Term</string>
     <string name="search_term_key" translatable="false">search_term</string>
-    <string name="search_term_default_value" translatable="false"></string>
+    <string name="search_term_default_value" translatable="false" />
     <string name="search_term_empty_label">No search term defined</string>
 
     <!-- Other strings. -->

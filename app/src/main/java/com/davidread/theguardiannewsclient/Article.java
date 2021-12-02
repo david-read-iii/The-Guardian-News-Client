@@ -1,4 +1,4 @@
-package com.davidread.newsfeed;
+package com.davidread.theguardiannewsclient;
 
 import android.os.Parcel;
 import android.os.Parcelable;

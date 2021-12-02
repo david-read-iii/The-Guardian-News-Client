@@ -1,4 +1,4 @@
-package com.davidread.newsfeed;
+package com.davidread.theguardiannewsclient;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String RECYCLER_VIEW_POSITION_KEY = "recycler_view_position";
 
     /**
-     * {@link com.davidread.newsfeed.RecyclerViewOnItemClickListener.OnItemClickListener} defines
+     * {@link com.davidread.theguardiannewsclient.RecyclerViewOnItemClickListener.OnItemClickListener} defines
      * how the {@link RecyclerView} handles its itemClick event.
      */
     private final RecyclerViewOnItemClickListener.OnItemClickListener onItemClickListener = new RecyclerViewOnItemClickListener.OnItemClickListener() {

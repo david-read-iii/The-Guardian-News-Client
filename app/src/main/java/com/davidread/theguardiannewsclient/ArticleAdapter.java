@@ -1,4 +1,4 @@
-package com.davidread.newsfeed;
+package com.davidread.theguardiannewsclient;
 
 import android.content.Context;
 import android.util.Log;

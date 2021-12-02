@@ -1,4 +1,4 @@
-package com.davidread.newsfeed;
+package com.davidread.theguardiannewsclient;
 
 import android.content.Context;
 import android.view.GestureDetector;
@@ -61,7 +61,10 @@ public class RecyclerViewOnItemClickListener implements RecyclerView.OnItemTouch
         View child = rv.findChildViewUnder(e.getX(), e.getY());
         if (child != null && onItemClickListener != null && gestureDetector.onTouchEvent(e)) {
             int position = rv.getChildAdapterPosition(child);
-            int viewType = rv.getAdapter().getItemViewType(position);
+            int viewType = -1;
+            if (rv.getAdapter() != null) {
+                viewType = rv.getAdapter().getItemViewType(position);
+            }
             onItemClickListener.onItemClick(child, position, viewType);
         }
         return false;
