@@ -8,7 +8,6 @@
         app:entryValues="@array/order_by_values"
         app:icon="@drawable/ic_order_by_black"
         app:key="@string/order_by_key"
-        app:layout="@layout/list_item_preference"
         app:title="@string/order_by_label" />
 
     <EditTextPreference
@@ -17,7 +16,6 @@
         app:defaultValue="@string/search_term_default_value"
         app:icon="@drawable/ic_search_term_black"
         app:key="@string/search_term_key"
-        app:layout="@layout/list_item_preference"
         app:title="@string/search_term_label" />
 
     <!-- Empty element so bottom divider shows on last preference. -->

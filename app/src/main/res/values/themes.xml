@@ -1,25 +1,38 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <!-- Base application theme. -->
     <style name="Theme.NewsFeed" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+
+        <!-- Base application colors. -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryVariant">@color/primary_dark</item>
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorSecondary">@color/secondary_light</item>
         <item name="colorSecondaryVariant">@color/secondary_dark</item>
         <item name="colorOnSecondary">@color/black</item>
+        <item name="colorControlNormal">@color/black</item>
+        <item name="colorControlActivated">?attr/colorSecondary</item>
+        <item name="colorControlHighlight">?attr/colorSecondary</item>
+
+        <!-- Other application colors. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <item name="android:navigationBarColor">?attr/colorPrimaryVariant</item>
         <item name="android:colorEdgeEffect">?attr/colorSecondary</item>
-        <item name="toolbarStyle">@style/Toolbar</item>
+
+        <!-- Base application default styles and drawables. -->
+        <item name="toolbarStyle">@style/ToolbarStyle</item>
         <item name="actionButtonStyle">@style/ToolbarButtonStyle</item>
         <item name="toolbarNavigationButtonStyle">@style/ToolbarButtonStyle</item>
-        <item name="homeAsUpIndicator">@drawable/ic_action_back</item>
         <item name="actionOverflowButtonStyle">@style/ToolbarOverflowButtonStyle</item>
+        <item name="dropDownListViewStyle">@style/ToolbarOverflowMenuListViewStyle</item>
+
+        <!-- Base application default drawables. -->
+        <item name="homeAsUpIndicator">@drawable/ic_action_back</item>
+
     </style>
 
-    <!-- Toolbar theme. -->
-    <style name="Toolbar" parent="Widget.MaterialComponents.Toolbar">
+    <!-- Toolbar style. -->
+    <style name="ToolbarStyle" parent="Widget.MaterialComponents.Toolbar">
         <item name="android:background">?attr/colorPrimary</item>
         <item name="titleTextColor">?attr/colorOnPrimary</item>
     </style>
@@ -33,6 +46,11 @@
     <style name="ToolbarOverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
         <item name="android:background">@drawable/toolbar_button_ripple_background</item>
         <item name="android:src">@drawable/ic_action_overflow</item>
+    </style>
+
+    <!-- Toolbar overflow menu ListView style. -->
+    <style name="ToolbarOverflowMenuListViewStyle" parent="Widget.AppCompat.ListView.DropDown">
+        <item name="android:listSelector">@drawable/list_item_ripple_background</item>
     </style>
 
     <!-- Primary TextView style. -->

@@ -1,21 +1,46 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <!-- Base application theme. -->
     <style name="Theme.NewsFeed" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+
+        <!-- Base application colors. -->
         <item name="colorPrimary">@color/primary_light</item>
         <item name="colorPrimaryVariant">@color/primary_dark</item>
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorSecondary">@color/secondary_light</item>
         <item name="colorSecondaryVariant">@color/secondary_light</item>
         <item name="colorOnSecondary">@color/black</item>
+        <item name="colorControlNormal">@color/white</item>
+        <item name="colorControlActivated">?attr/colorSecondary</item>
+        <item name="colorControlHighlight">?attr/colorSecondary</item>
+
+        <!-- Other application colors. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <item name="android:navigationBarColor">?attr/colorPrimaryVariant</item>
         <item name="android:colorEdgeEffect">?attr/colorSecondary</item>
-        <item name="toolbarStyle">@style/Toolbar</item>
+
+        <!-- Base application default styles. -->
+        <item name="toolbarStyle">@style/ToolbarStyle</item>
         <item name="actionButtonStyle">@style/ToolbarButtonStyle</item>
         <item name="toolbarNavigationButtonStyle">@style/ToolbarButtonStyle</item>
-        <item name="homeAsUpIndicator">@drawable/ic_action_back</item>
         <item name="actionOverflowButtonStyle">@style/ToolbarOverflowButtonStyle</item>
+        <item name="dropDownListViewStyle">@style/ToolbarOverflowMenuListViewStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/DialogButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/DialogButtonStyle</item>
+
+        <!-- Base application default drawables. -->
+        <item name="homeAsUpIndicator">@drawable/ic_action_back</item>
+
+    </style>
+
+    <!-- Dialog Button style. -->
+    <style name="DialogButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="materialThemeOverlay">@style/DialogButtonThemeOverlayStyle</item>
+    </style>
+
+    <!-- Dialog Button ThemeOverlay style. -->
+    <style name="DialogButtonThemeOverlayStyle">
+        <item name="colorPrimary">?attr/colorSecondary</item>
     </style>
 
 </resources>
