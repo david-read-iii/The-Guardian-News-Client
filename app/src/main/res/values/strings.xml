@@ -34,7 +34,14 @@
     <string name="search_term_default_value" translatable="false" />
     <string name="search_term_empty_label">No search term defined</string>
 
+    <!-- About setting strings. -->
+    <string name="about_label">About</string>
+    <string name="about_key" translatable="false">about</string>
+    <string name="about_dialog_title_label">About</string>
+    <string name="about_dialog_message_label">All news articles are sourced by Guardian News &amp; Media Limited. Their contact information can be found on their website.</string>
+    <string name="about_dialog_positive_button_label">Visit Website</string>
+
     <!-- Other strings. -->
-    <string name="no_browser_label">Install a browser app to view the article</string>
+    <string name="no_browser_label">Install a browser app to open the link</string>
 
 </resources>

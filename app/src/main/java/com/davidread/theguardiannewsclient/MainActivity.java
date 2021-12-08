@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
             // Case where an article view is clicked.
             if (viewType == ArticleAdapter.VIEW_TYPE_ARTICLE) {
 
-                Article article = (Article) articleAdapter.getArticle(position);
+                Article article = articleAdapter.getArticle(position);
                 String url = article.getUrl();
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse(url));
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
                 // Do nothing if no browser app is installed on the device.
                 if (intent.resolveActivity(getPackageManager()) == null) {
                     Log.e(LOG_TAG_NAME, "No browser app installed to handle view intent");
-                    Toast.makeText(MainActivity.this, getString(R.string.no_browser_label), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, getString(R.string.no_browser_label), Toast.LENGTH_LONG).show();
                     return;
                 }
 

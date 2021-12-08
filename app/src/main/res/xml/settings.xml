@@ -18,7 +18,10 @@
         app:key="@string/search_term_key"
         app:title="@string/search_term_label" />
 
-    <!-- Empty element so bottom divider shows on last preference. -->
-    <PreferenceCategory />
-
+    <Preference
+        app:allowDividerAbove="true"
+        app:icon="@drawable/ic_about_black"
+        app:key="@string/about_key"
+        app:title="@string/about_label" />
+    
 </androidx.preference.PreferenceScreen>
