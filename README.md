@@ -23,5 +23,5 @@ THE_GUARDIAN_API_KEY="..."
 6. Install the artifact on your Android device and try it out.
 
 # Maintainers
-This project is mantained by:
+This project is maintained by:
 * [David Read](http://github.com/david-read-iii)
